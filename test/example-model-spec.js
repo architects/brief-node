@@ -1,6 +1,5 @@
 var briefcase = utils.briefcase()
 
-
 describe("An Example Model Instance", function(){
   var epic = briefcase.at("epics/model-definition-dsl")
 

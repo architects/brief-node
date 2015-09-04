@@ -41,6 +41,7 @@ global.it = function(description, testFn){
 }
 
 global.assert = require('assert')
+global._ = _
 
 require("./case-spec")
 require("./document-spec")

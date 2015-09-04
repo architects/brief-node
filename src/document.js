@@ -6,10 +6,11 @@ import Model from './model'
 import yaml from 'js-yaml'
 import squeeze from 'mdast-squeeze-paragraphs'
 import normalize from 'mdast-normalize-headings' 
+import cheerio from 'cheerio'
 import _ from 'underscore'
 
 const yamlProcessor       = mdast.use(yamlConfig)
-const htmlProcessor       = mdast.use(html,squeeze,normalize)
+const htmlProcessor       = mdast.use([html,squeeze,normalize])
 
 export default class Document {
   constructor(path, options){
@@ -55,6 +56,7 @@ export default class Document {
   */
   toRawHTML(options={}){
     this.raw_html = htmlProcessor.process(this.content)
+    this.$ = cheerio.load(this.raw_html)
     return this.raw_html
   }
 
