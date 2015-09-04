@@ -12,7 +12,6 @@ var Case = require("./lib/case.js"),
 module.exports = {
   "create": function(root, options){
     options = options || {}
-
-    return new Case(root, options)
+    return Case.load(root, options)
   }
 }

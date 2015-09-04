@@ -23,6 +23,10 @@ export default class Case {
   }
   
   at(path_alias) {
+    if(!path_alias.match(/\.md$/i)){
+      path_alias = path_alias + '.md' 
+    }
+
     return this.index[path_alias]
   }
 

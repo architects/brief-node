@@ -4,8 +4,8 @@
   "description": "temp",
   "main": "index.js",
   "scripts": {
-    "start-test-server": "node_modules/karma/bin/karma start",
-    "test": "node_modules/karma/bin/karma run",
+    "pretest": "babel -q -d lib src",
+    "test": "node test/start.js",
     "build": "babel -d lib src",
     "watch": "babel -w -d lib src"
   },
@@ -36,20 +36,7 @@
   },
   "devDependencies": {
     "babel": "^5.1.13",
-    "babelify": "^6.0.2",
-    "browserify": "^11.0.1",
-    "electron-prebuilt": "^0.31.2",
-    "jasmine-core": "latest",
-    "karma": "latest",
-    "karma-babel-preprocessor": "^5.2.2",
-    "karma-browserify": "^4.3.0",
-    "karma-chrome-launcher": "latest",
-    "karma-electron-launcher": "0.0.2",
-    "karma-jasmine": "^0.3.6",
-    "karma-jasmine-html-reporter-livereload": "^1.0.0",
-    "karma-jasmine-runner-reporter": "^0.1.0",
-    "karma-phantomjs-launcher": "^0.2.1",
     "node-inspector": "latest",
-    "watchify": "^3.2.0"
+    "colors": "latest"
   }
 }
