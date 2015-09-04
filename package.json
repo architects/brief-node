@@ -33,6 +33,7 @@
     "glob-all": "latest",
     "underscore": "latest",
     "underscore.string": "latest",
+    "i": "latest",
     "js-yaml": "latest"
   },
   "devDependencies": {

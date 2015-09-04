@@ -6,4 +6,8 @@ describe("An Example Model Instance", function(){
   it("parses the YAML frontmatter data",function(){
     assert.equal(epic.data.title,'Model Definition DSL')
   })
+
+  it("has a group name",function(){
+    assert.equal(epic.groupName, 'epics')
+  })
 })

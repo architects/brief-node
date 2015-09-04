@@ -1,6 +1,10 @@
 import glob from 'glob-all'
 import path from 'path'
 import Model from './model'
+import inflections from 'i'
+import _ from 'underscore'
+
+const inflect = inflections(true)
 
 export default class Case {
   static load(root, options={}){
@@ -20,6 +24,7 @@ export default class Case {
     }
 
     this.buildIndex()
+    this.createCollections()
   }
   
   at(path_alias) {
@@ -29,14 +34,66 @@ export default class Case {
 
     return this.index[path_alias]
   }
+  
+  selectModelsByType(type){
+    return _(this.getAllModels()).select((model)=>{
+      return model.type == type
+    })
+  }
+
+  selectModelsByGroup(groupName){
+    return _(this.getAllModels()).select((model)=>{
+      return model.groupName == groupName
+    })
+  }
+
+
+  createCollections(){
+    let groups = this.getGroupNames()
+
+    groups.forEach((group)=>{
+      this[group] = _(this.selectModelsByGroup(group))
+    })
+  }
 
   buildIndex(){
     let paths = this.getDocumentPaths()
+    let briefcase = this
 
     paths.forEach((path)=>{
       let path_alias = path.replace(this.config.docs_path + '/', '')
       this.index[path_alias] = Model.create(path, {relative_path: path_alias, parent: this})
     })
+  }
+  
+  getAllModels(){
+    return _(this.index).values()
+  }
+
+  getAllDocuments(){
+    return _(this.getAllModels()).pluck('document')
+  }
+  
+  getGroupNames(){
+    let pluralize = inflect.pluralize
+    let groupNames = []
+    let types = this.getDocumentTypes()
+    
+    types.forEach((docType)=>{
+      groupNames.push(pluralize(docType))  
+    })
+
+    return groupNames
+  }
+
+  getDocumentTypes(){
+    let types = []
+
+    this.getAllDocuments().forEach((doc)=>{
+      types.push(doc.data.type)
+    })
+
+    return _(types).uniq()
   }
 
   getDocumentPaths(){
