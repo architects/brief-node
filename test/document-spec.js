@@ -1,5 +1,9 @@
-import Case from "../src/case"
+import Document from "../src/document"
 
 describe('Document', ()=>{
-  console.log(__dirname)
+  let document = new Document()
+
+  it('loads the markdown content from a path', ()=>{
+    expect(1).toBe(5)
+  })
 })

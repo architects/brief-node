@@ -6,6 +6,7 @@ import Model from './model'
 import yaml from 'js-yaml'
 import squeeze from 'mdast-squeeze-paragraphs'
 import normalize from 'mdast-normalize-headings' 
+import _ from 'underscore'
 
 const yamlProcessor       = mdast.use(yamlConfig)
 const htmlProcessor       = mdast.use(html,squeeze,normalize)

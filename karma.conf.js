@@ -6,8 +6,7 @@ module.exports = function(config) {
     
     plugins:[
       'karma-babel-preprocessor',
-      'karma-chrome-launcher',
-      'karma-phantomjs-launcher',
+      'karma-electron-launcher',
       'karma-jasmine-runner-reporter',
       'karma-browserify',
       'karma-jasmine'
@@ -45,29 +44,24 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['jasmine-runner','progress'],
-
-    jasmineRunnerReporter: {
-      outputFile: 'jasmine-runner.html'
-    },
+    reporters: ['progress'],
 
     // web server port
     port: 9876,
-
 
     // enable / disable colors in the output (reporters and logs)
     colors: true,
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_ERROR,
+    logLevel: config.LOG_INFO,
 
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: true,
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: [],
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
