@@ -1,36 +1,36 @@
-var briefcase = utils.briefcase(),
-    empty = utils.empty,
-    index = _.indexOf
+var brief  = require("../index"),
+    briefcase = brief.example()
 
 describe("The Briefcase", function(){
+  var epic = briefcase.at("epics/model-definition-dsl")
+
   it("builds an index of the documents", function(){
-    assert(!empty(briefcase.index))
+    Object.keys(briefcase.index).length.should.be.above(0)
   })
 
   it("provides access to documents by their relative path", function(){
-    var epic = briefcase.at("epics/model-definition-dsl")
-    assert(epic)
+    briefcase.at('epics/model-definition-dsl').should.have.property('document')
   })
 
   it("creates collections for the diferent groups", function(){
     var titles = briefcase.epics.pluck('title')
-    assert(titles.length == 1)
-    assert.notEqual(_(titles).indexOf('Model Definition DSL'), -1)
+
+    titles.length.should.be.above(0)
+    titles.should.containEql('Model Definition DSL')
   })
 
   it("provides access to all of the group names", function(){
     var types = briefcase.getGroupNames()
 
-    assert.notEqual(index(types,'epics'), -1)
-    assert.notEqual(index(types,'projects'), -1)
-    assert.equal(index(types,'randoms'), -1)
+    types.should.containEql('epics')
+    types.should.containEql('projects')
   })
 
   it("provides access to all of the documents", function(){
-    assert(!empty(briefcase.getAllDocuments()))  
+    briefcase.getAllDocuments().length.should.be.above(0)
   })
 
   it("provides access to all of the models", function(){
-    assert(!empty(briefcase.getAllModels()))  
+    briefcase.getAllModels().length.should.be.above(0)
   })
 })

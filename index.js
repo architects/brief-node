@@ -9,7 +9,13 @@
 var Case = require("./lib/case.js"),
     Document = require("./lib/document.js")
 
+var example;
+
 module.exports = {
+  "example": function(){
+    example = example || Case.load(__dirname + '/test/example')
+    return example
+  },
   "create": function(root, options){
     options = options || {}
     return Case.load(root, options)

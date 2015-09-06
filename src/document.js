@@ -1,66 +1,69 @@
 import fs from 'fs'
 import mdast from 'mdast'
-import yamlConfig from 'mdast-yaml'
+import yaml from 'mdast-yaml'
 import html from 'mdast-html'
 import Model from './model'
-import yaml from 'js-yaml'
+import structure from './structure'
 import squeeze from 'mdast-squeeze-paragraphs'
 import normalize from 'mdast-normalize-headings' 
 import cheerio from 'cheerio'
 import _ from 'underscore'
 
-const yamlProcessor       = mdast.use(yamlConfig)
-const htmlProcessor       = mdast.use([html,squeeze,normalize])
+const processor = mdast.use([yaml,squeeze,normalize,structure,html])
 
 export default class Document {
-  constructor(path, options){
+  toString() {
+    return this.path
+  }
+
+  constructor(path, options) {
     this.path = path
     this.options = options
-
-    this.readContent()
-    this.buildMetaData()
+    this.process()
   }
   
-  render(){
-    return this.toRawHTML()
+  rendered() {
+    this.render()
+    return this
   }
 
-  toModel(){
+  render() {
+    this.process()
+  }
+
+  process() {
+    this.content = readPath(this.path)
+    this.ast = processor.parse(this.content)
+    
+    if(this.options.contentWasParsed) {
+      this.options.contentWasParsed.call(this, this.ast)
+    }
+    
+    this.ast = processor.run(this.ast)
+    
+    if(this.getFirstNode() && this.getFirstNode().type === "yaml") {
+      this.data = this.getFirstNode().yaml
+    }
+
+    if(this.options.beforeRender) {
+      this.options.beforeRender.call(this, this.ast)
+    }
+    
+    this.html = processor.stringify(this.ast)
+    this.$ = cheerio.load(this.html)
+
+    this.html
+  }
+
+  toModel() {
     return Model.create(this.path, this.options)
   }
- 
-  buildMetaData(){
-    this.data = this.parseFrontMatter() || {}
-  }
 
-  structureRenderedContent(){
-
+  getFirstNode() {
+    return this.ast && this.ast.children && this.ast.children[0] 
   }
+}
 
-  parseFrontMatter(){
-    let data = this.toParsed()
-    let children = data.children || []
-    let el = children[0]
-
-    if (el.type == "yaml" && el.value && el.value.length > 0){
-      return yaml.load(el.value) 
-    }
-  }
-
-  readContent(){
-    this.content = fs.readFileSync(this.path).toString()
-  }
-  
-  /* 
-  * Renders the markdown to Raw HTML. 
-  */
-  toRawHTML(options={}){
-    this.raw_html = htmlProcessor.process(this.content)
-    this.$ = cheerio.load(this.raw_html)
-    return this.raw_html
-  }
-
-  toParsed(){
-    return yamlProcessor.parse(this.content)
-  }
+function readPath(path) {
+  return fs.readFileSync(path).toString()
 }

@@ -7,11 +7,19 @@ export default class Model {
     let document = new Document(path, options)
     return new Model(document, options)
   }
+  
+  toString(){
+    return this.document.path
+  }
 
-  constructor(document, options={}){
+  constructor(document, options={}) {
     this.document = document
     this.data = document.data
-    this.groupName = inflect().pluralize(this.data.type)
+    this.groupName = "documents"
+
+    if(this.data.type){
+      this.groupName = inflect().pluralize(this.data.type)
+    }
 
     let keys = Object.keys(this.data)
 
@@ -19,5 +27,4 @@ export default class Model {
       this[key] = this[key] || document.data[key]
     })
   }
-
 }

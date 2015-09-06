@@ -7,11 +7,15 @@ import _ from 'underscore'
 const inflect = inflections(true)
 
 export default class Case {
-  static load(root, options={}){
+  static load(root, options={}) {
     return new Case(root,options)
   }
+  
+  toString(){
+    return this.root
+  }
 
-  constructor(root, options){
+  constructor(root, options) {
     this.root = path.resolve(root)
     this.options = options || {}
     this.index = {}
@@ -35,28 +39,20 @@ export default class Case {
     return this.index[path_alias]
   }
   
-  selectModelsByType(type){
-    return _(this.getAllModels()).select((model)=>{
-      return model.type == type
-    })
+  selectModelsByType(type) {
+    return this.getAllModels().filter(model => model.type === type)
   }
 
-  selectModelsByGroup(groupName){
-    return _(this.getAllModels()).select((model)=>{
-      return model.groupName == groupName
-    })
+  selectModelsByGroup(groupName) {
+    return this.getAllModels().filter(model => model.groupName === groupName)
   }
 
-
-  createCollections(){
+  createCollections() {
     let groups = this.getGroupNames()
-
-    groups.forEach((group)=>{
-      this[group] = _(this.selectModelsByGroup(group))
-    })
+    groups.forEach(group => this[group] = _(this.selectModelsByGroup(group)))
   }
 
-  buildIndex(){
+  buildIndex() {
     let paths = this.getDocumentPaths()
     let briefcase = this
 
@@ -66,27 +62,22 @@ export default class Case {
     })
   }
   
-  getAllModels(){
+  getAllModels() {
     return _(this.index).values()
   }
 
-  getAllDocuments(){
-    return _(this.getAllModels()).pluck('document')
+  getAllDocuments() {
+    return this.getAllModels(model => model.document)
   }
   
-  getGroupNames(){
+  getGroupNames() {
     let pluralize = inflect.pluralize
-    let groupNames = []
     let types = this.getDocumentTypes()
     
-    types.forEach((docType)=>{
-      groupNames.push(pluralize(docType))  
-    })
-
-    return groupNames
+    return types.map(type => pluralize(type))
   }
 
-  getDocumentTypes(){
+  getDocumentTypes() {
     let types = []
 
     this.getAllDocuments().forEach((doc)=>{
@@ -96,7 +87,7 @@ export default class Case {
     return _(types).uniq()
   }
 
-  getDocumentPaths(){
+  getDocumentPaths() {
     let docs_path = path.resolve(this.config.docs_path)
     return glob.sync(path.join(docs_path,'**/*.md'))
   }
