@@ -4,8 +4,7 @@
   "description": "temp",
   "main": "index.js",
   "scripts": {
-    "pretest": "babel -q -d lib src",
-    "test": "./node_modules/mocha/bin/mocha --require should --reporter spec test/**/*-spec.js",
+    "test": "make compile test",
     "build": "babel -d lib src",
     "watch": "babel -w -d lib src"
   },

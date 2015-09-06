@@ -14,7 +14,7 @@ export default class Model {
 
   constructor(document, options={}) {
     this.document = document
-    this.data = document.data
+    this.data = document.data || {}
     this.groupName = "documents"
 
     if(this.data.type){

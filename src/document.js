@@ -19,7 +19,7 @@ export default class Document {
   constructor(path, options) {
     this.path = path
     this.options = options
-    this.process()
+    this._process()
   }
   
   rendered() {
@@ -28,12 +28,13 @@ export default class Document {
   }
 
   render() {
-    this.process()
+    return this.html ? this.html : this._process()
   }
 
-  process() {
+  _process() {
     this.content = readPath(this.path)
     this.ast = processor.parse(this.content)
+    this.data = {}
     
     if(this.options.contentWasParsed) {
       this.options.contentWasParsed.call(this, this.ast)
@@ -41,9 +42,13 @@ export default class Document {
     
     this.ast = processor.run(this.ast)
     
-    if(this.getFirstNode() && this.getFirstNode().type === "yaml") {
-      this.data = this.getFirstNode().yaml
+    let firstNode = this._getFirstNode()
+
+    if(firstNode && firstNode.type === "yaml") {
+      this.data = this._getFirstNode().yaml
     }
+
+    this.data.type = this.data.type || "document"
 
     if(this.options.beforeRender) {
       this.options.beforeRender.call(this, this.ast)
@@ -59,7 +64,7 @@ export default class Document {
     return Model.create(this.path, this.options)
   }
 
-  getFirstNode() {
+  _getFirstNode() {
     return this.ast && this.ast.children && this.ast.children[0] 
   }
 }

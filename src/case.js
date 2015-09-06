@@ -74,7 +74,7 @@ export default class Case {
     let pluralize = inflect.pluralize
     let types = this.getDocumentTypes()
     
-    return types.map(type => pluralize(type))
+    return types.map(type => pluralize(type || ""))
   }
 
   getDocumentTypes() {
