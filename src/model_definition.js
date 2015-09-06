@@ -2,12 +2,19 @@ import inflect from 'i'
 import fs from 'fs'
 import _ from 'underscore'
 import DocumentSection from './document_section'
+import Model from './model'
 
 const inflections = inflect()
 
-var definitions = {}
+const definitions = {}
+const type_aliases = {}
 
 const dsl = {
+  close: function(){
+    let current = ModelDefinition.last()
+    return current.toPrototype()
+  },
+
   define: function( modelName, options = {} ) {
     let current = definitions[modelName]
     definitions[modelName] = current || new ModelDefinition(modelName, options)
@@ -34,8 +41,11 @@ const dsl = {
 const dsl_methods = [
   "define",
   "attributes",
+  "attribute",
   "section",
-  "action"
+  "action",
+  "actions",
+  "close"
 ]
 
 export default class ModelDefinition {
@@ -72,17 +82,71 @@ export default class ModelDefinition {
     return definitions
   }
 
+  static lookup (aliasOrName) {
+    if(definitions[aliasOrName]){
+      return definitions[aliasOrName]
+    }
+    
+    let name = type_aliases[aliasOrName]
+    
+    if(name && definitions[name]){
+      return definitions[name]
+    }
+  }
+
   constructor (name = "Document") {
     this.name = inflections.camelize(name)
+    this.type_alias = inflections.underscore(name.toLowerCase())
+
+    this.attributes = {}
+    this.sections = {}
+    this.actions = {}
+
+    //store a reference in the bucket
     definitions[this.name] = this
+    type_aliases[this.type_alias] = this.name
   }
   
+  static getTypeAliases(){
+    return Object.keys(type_aliases)
+  }
+
+  toPrototype () {
+    let obj = function(){ }
+    let definition = this
+
+    obj.prototype = Model
+    
+    obj.getModelDefinition = function(){
+      return definition
+    }
+
+    for(var action in this.actions){
+      obj[action] = function(){
+        actions[action].apply(obj, arguments)
+      }
+    }
+
+    return obj
+  }
+  
+  /**
+   * returns the attribute names as an array
+  */
+  attributeNames () {
+    return Object.keys(this.attributes)
+  }
   /** 
    * defines attributes for the model's metadata
   */
   defineAttributes (list = []) {
-    this.attributes = this.attributes || []
-    this.attributes = this.attributes.concat(list)
+    list.forEach(attr => {
+      if(typeof(attr) === "string")
+        attr = {name: attr}
+      
+      this.attributes[attr.name] = attr
+    })
+
     return this
   }
   
@@ -92,7 +156,6 @@ export default class ModelDefinition {
    * consist of headings nested within headings.
   */
   defineSection (sectionName, options = {}) {
-    this.sections = this.sections || {}
     this.sections[sectionName] = new DocumentSection(sectionName, this, options)
     return this.sections[sectionName]
   }
@@ -102,7 +165,6 @@ export default class ModelDefinition {
    * the command line, and run on arbitrary paths.
   */
   defineAction (actionName, handler) {
-    this.actions = this.actions || {}
     this.actions[actionName] = handler
     return this
   }

@@ -1,15 +1,11 @@
 import Document from './document'
+import ModelDefinition from './model_definition'
 import Case from './case'
 import inflect from 'i'
 
 export default class Model {
-  static create(path, options={}) {
-    let document = new Document(path, options)
-    return new Model(document, options)
-  }
-  
-  toString(){
-    return this.document.path
+  static fromDocument (document){
+    return new Model(document)
   }
 
   constructor(document, options={}) {
@@ -21,11 +17,15 @@ export default class Model {
     if(this.data.type){
       this.groupName = inflect().pluralize(this.data.type)
     }
+    
+    Object.keys(this.data).forEach(key => this[key] = this.data[key])
+  }
 
-    let keys = Object.keys(this.data)
+  toString(){
+    return this.document.path
+  }
+  
+  getModelDefinition(){
 
-    keys.forEach((key)=>{
-      this[key] = this[key] || document.data[key]
-    })
   }
 }

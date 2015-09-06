@@ -8,6 +8,10 @@ describe("Model Definitions", function(){
     briefcase.loadedModelDefinitions().should.containEql("Epic")
   })
 
+  it("should load by aliases as well", function(){
+    briefcase.getModelDefinition('epic').should.have.property('actions')
+  })
+
   it("should return a definition for our model", function(){
     definition.name.should.equal('Epic')
   })
@@ -27,8 +31,15 @@ describe("Model Definitions", function(){
   })
 
   it("should define some attributes", function(){
-    definition.attributes.should.containEql('status')
-    definition.attributes.should.containEql('title')
-    definition.attributes.should.containEql('project')
+    definition.attributeNames().should.containEql('title','status','project')
   })
+
+  it("should be findable by an alias", function(){
+
+  })
+
+  it("should create a model prototype", function(){
+
+  })
+
 })

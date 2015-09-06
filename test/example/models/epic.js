@@ -1,4 +1,4 @@
-exports = define("Epic")
+define("Epic")
 
 attributes(
   "title", 
@@ -17,3 +17,5 @@ action("publish", function (params) {
 
   epic.setStatus("published")
 })
+
+exports = close()

@@ -60,8 +60,8 @@ export default class Document {
     this.html
   }
 
-  toModel() {
-    return Model.create(this.path, this.options)
+  toModel (options={}) {
+    return Model.fromDocument(this, options)
   }
 
   _getFirstNode() {

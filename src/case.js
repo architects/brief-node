@@ -1,5 +1,6 @@
 import glob from 'glob-all'
 import path from 'path'
+import Document from './document'
 import Model from './model'
 import ModelDefinition from './model_definition'
 import inflections from 'i'
@@ -140,19 +141,18 @@ export default class Case {
     return ModelDefinition.getAll()
   }
 
-  getModelDefinition (modelName) {
-    return this.model_definitions[modelName]
+  getModelDefinition (modelNameOrAlias) {
+    return ModelDefinition.lookup(modelNameOrAlias)
+  }
+
+  getTypeAliases (){
+    return ModelDefinition.getTypeAliases()
   }
 
   getModelSchema () {
     return ModelDefinition.getModelSchema()
   }
   
-  getModelDefinition (modelIdentifier) {
-    let schema = ModelDefinition.getModelSchema()
-    return schema[modelIdentifier]
-  }
-
   _createCollections() {
     let groups = this.getGroupNames()
     groups.forEach(group => this[group] = _(this.selectModelsByGroup(group)))
@@ -179,7 +179,16 @@ export default class Case {
 
     paths.forEach((path)=>{
       let path_alias = path.replace(this.config.docs_path + '/', '')
-      this.index[path_alias] = Model.create(path, {id: path_alias.replace(/\.md$/i,''), parent: this})
+      let id = path_alias.replace('.md','')
+      let document = new Document(path, {id: id})
+      let model = document.toModel({id: id}) 
+      
+      model.id = id
+      model.getParent = ()=>{ 
+        return this
+      }
+
+      this.index[path_alias] = model
     })
   }
 
