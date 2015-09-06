@@ -25,11 +25,6 @@ describe("The Document", function(){
     document.html.should.match(/wrapper/)
   })
 
-  it("stores a reference to the documents path alias", function(){
-    document.html.should.match(/\<div/)
-    document.html.should.match(/wrapper/)
-  })
-  
   it("stores a reference to the markdown ast", function(){
     document.should.have.property('ast')
     document.ast.should.have.property('type')
