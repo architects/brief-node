@@ -6,18 +6,9 @@
 * @fileoverview database applications powered by written words
 */
 
-var Case = require("./lib/case.js"),
-    Document = require("./lib/document.js")
-
-var example;
-
-module.exports = {
-  "example": function(){
-    example = example || Case.load(__dirname + '/test/example')
-    return example
-  },
-  "create": function(root, options){
-    options = options || {}
-    return Case.load(root, options)
-  }
+if(process.env.DEV_MODE){
+  require('babel/register')
+  module.exports = require("./src/index")
+} else {
+  module.exports = require("./lib/index")
 }

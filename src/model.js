@@ -9,10 +9,11 @@ export default class Model {
   }
 
   constructor(document, options={}) {
-    this.document   = document
-    this.data       = document.data || {}
-    this.groupName  = options.groupName || "documents"
-    this.id         = options.id
+    this.document     = document
+    this.data         = document.data || {}
+    this.groupName    = options.groupName || "documents"
+    this.id           = options.id
+    this.document.id  = this.id
 
     if(this.data.type){
       this.groupName = inflect().pluralize(this.data.type)

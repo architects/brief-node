@@ -13,30 +13,37 @@ const articleRenderer = function(node){
   return h(this, node, 'article', this.all(node).join('\n'), true);
 }
 
+const slice = Array.prototype.slice
+const splice = Array.prototype.splice
+
 export default function attacher (mdast, options) {
   let MarkdownCompiler = mdast.Compiler
   
   MarkdownCompiler.prototype.div = divRenderer
+  MarkdownCompiler.prototype.section = sectionRenderer
+  MarkdownCompiler.prototype.article = articleRenderer
 
   return function transformer (ast) {
-    visit(ast, 'heading', (node)=>{
-      node.attributes = {'data-start': node.position.start.line}
+    let headingIndex = 0
+    
+    let headings = ast.children.filter(child => child.type === "heading")
+    
+    let previousHeading, parentHeading
+
+    ast.children.forEach(child => {
+      if(child.type === "heading"){
+        child.headingIndex = ++headingIndex
+        child.attributes = child.attributes || {}
+        child.attributes['data-line-number'] = child.position.start.line
+      }
+      
+      if(previousHeading) {
+        child.p
+      }
+
+      if(child.type === "heading"){
+        previousHeading = child
+      }
     })
-    
-    let children = ast.children,
-        length = children.length,
-        first = children[0],
-        wrapped = []
-    
-    if(first && first.type === "yaml"){
-      ast.children = children.slice(0,1)
-      ast.children.push({
-        type: "div",
-        children: children.slice(1, length),
-        attributes: {
-          class: "wrapper"
-        }
-      })
-    }
   }
 }
