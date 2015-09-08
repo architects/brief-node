@@ -2,6 +2,8 @@ import fs from 'fs'
 import mdast from 'mdast'
 import yaml from 'mdast-yaml'
 import html from 'mdast-html'
+import Model from './model'
+import Presenter from "./presenter"
 import structure from './structure'
 import squeeze from 'mdast-squeeze-paragraphs'
 import normalize from 'mdast-normalize-headings' 
@@ -10,13 +12,9 @@ import _ from 'underscore'
 import visit from 'mdast-util-visit'
 import inflect from 'i'
 
-import Model from './model'
-import Presenter from "./presenter"
 
-const processor = mdast.use([yaml,squeeze,normalize,structure,html])
+const processor = mdast.use([yaml,squeeze,normalize,structure, html])
 const inflections = inflect()
-
-const cache = {} 
 
 export default class Document {
   toString() {
@@ -29,7 +27,7 @@ export default class Document {
   */
   constructor(path, options) {
     this.path = path
-    this.options = options
+    this.options = options || {}
     process(this)
   }
   
@@ -72,10 +70,7 @@ export default class Document {
   }
 
   getChildren () {
-    let cached = cache[this.path]
-
-    if(cached)
-      return cached
+    return this.ast.children[0].children  
   }
 
   getHeadingNodes () {
@@ -111,11 +106,18 @@ function process (document) {
 
   document.ast = parse(document)
   document.runHook("documentWillRender", document.ast)
- 
-  let children = cache[document.path] = document.ast.children
-
-  applyWrapper(document.ast, children, document.id, (document.options.wrapperClass || "wrapper")) 
-
+  
+  document.ast.children = [{ 
+    type: "link",
+    data:{
+      htmlName: "div",
+      htmlAttributes:{
+        "class": "wrapper"
+      }
+    },
+    children: document.ast.children
+  }]
+  
   document.html = stringify(document)
   document.$ = cheerio.load(document.html)
   document.runHook("documentDidRender", document.html)
@@ -129,17 +131,4 @@ function stringify (document, options={}) {
 
 function readPath(path) {
   return fs.readFileSync(path).toString()
-}
-
-function applyWrapper(ast, id, wrapperClass, attributes={}) {
-  attributes.id = id
-  attributes.class = wrapperClass
-
-  ast.children = [{
-    type: "div",
-    attributes: attributes,
-    children:   ast.children
-  }]
-  
-  return ast
 }

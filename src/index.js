@@ -12,7 +12,7 @@ let brief = {
     return Case.load(root, options)
   },
   example: function(options={}){
-    return require("../test/example").use(brief)
+    return require("../test/example")()
   }
 }
 

@@ -1,6 +1,6 @@
 {
-  "name": "js-brief",
-  "version": "1.0.0",
+  "name": "brief-node",
+  "version": "2.0.0",
   "description": "temp",
   "main": "index.js",
   "scripts": {
@@ -46,5 +46,8 @@
     "node-inspector": "latest",
     "should": "^7.1.0",
     "underscore.string": "latest"
+  },
+  "babel":{
+    "sourceMaps": "inline"
   }
 }

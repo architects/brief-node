@@ -1,9 +1,6 @@
 describe "The Briefcase", ->
   epic = briefcase.at "epics/model-definition-dsl"
 
-  it "builds an index of the documents", ->
-    Object.keys(briefcase.index).length.should.be.above(0)
-
   it "provides access to documents by their relative path", ->
     briefcase.at('epics/model-definition-dsl').should.have.property('document')
 

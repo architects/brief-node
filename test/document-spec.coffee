@@ -1,6 +1,8 @@
+Document = require("../src/document")
+path = require.resolve("./example/docs/epics/model-definition-dsl.md")
+
 describe "The Document", ->
-  epic = briefcase.at('epics/model-definition-dsl')
-  document = epic.document.rendered()
+  document = new Document(path)
 
   it "Loads content from the path", ->
     length = document.content.length
@@ -25,7 +27,8 @@ describe "The Document", ->
 
   it "attaches special attributes to the headings", ->
     document.visit 'heading', (node)->
-      node.attributes.should.have.property('data-line-number')
+      node.data.should.have.property('htmlAttributes')
+      node.data.htmlAttributes.should.have.property('data-line-number')
 
   it "has an css selecting interface", ->
     document.$('h1').length.should.equal(1)

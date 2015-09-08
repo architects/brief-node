@@ -37,13 +37,13 @@ export default class Case {
     this.model_definitions = {}
     
     this.config = {
-      docs_path: options.docs_path || (this.root + '/docs'),
-      models_path: options.models_path || path.join(this.root, 'models'),
-      assets_path: options.assets_path || path.join(this.root, 'assets')
+      docs_path: path.join(this.root, 'docs'),
+      models_path: path.join(this.root, 'models'),
+      assets_path: path.join(this.root, 'assets')
     }
     
     this._loadModelDefinitions()
-    this._buildIndex()
+    this._buildIndexFromDisk()
     this._createCollections()
   }
   
@@ -173,7 +173,7 @@ export default class Case {
     ModelDefinition.getAll().forEach(definition => this.loadModel(definition))
   }
 
-  _buildIndex() {
+  _buildIndexFromDisk() {
     let paths = this._getDocumentPaths()
     let briefcase = this
 

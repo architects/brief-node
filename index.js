@@ -6,9 +6,13 @@
 * @fileoverview database applications powered by written words
 */
 
+var brief;
+
 if(process.env.DEV_MODE){
   require('babel/register')
-  module.exports = require("./src/index")
+  brief = require("./src/index")
 } else {
-  module.exports = require("./lib/index")
+  brief = require("./lib/index")
 }
+
+module.exports = brief
