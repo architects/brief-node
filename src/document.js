@@ -2,7 +2,6 @@ import fs from 'fs'
 import mdast from 'mdast'
 import yaml from 'mdast-yaml'
 import html from 'mdast-html'
-import Model from './model'
 import structure from './structure'
 import squeeze from 'mdast-squeeze-paragraphs'
 import normalize from 'mdast-normalize-headings' 
@@ -11,8 +10,13 @@ import _ from 'underscore'
 import visit from 'mdast-util-visit'
 import inflect from 'i'
 
+import Model from './model'
+import Presenter from "./presenter"
+
 const processor = mdast.use([yaml,squeeze,normalize,structure,html])
 const inflections = inflect()
+
+const cache = {} 
 
 export default class Document {
   toString() {
@@ -34,7 +38,7 @@ export default class Document {
    *
    * @return {Model} - a model instance 
   */
-   toModel (options={}) {
+  toModel (options={}) {
     return Model.fromDocument(this, options)
   }
   
@@ -55,7 +59,11 @@ export default class Document {
     return this.html ? this.html : process(this) 
   }
 
-  visit(type, iterator){
+  present (options={}) {
+    return Presenter.present(this, options)
+  }
+
+  visit(type, iterator) {
     visit(this.ast, type, iterator)
   }
 
@@ -64,7 +72,14 @@ export default class Document {
   }
 
   getChildren () {
-    return this.ast.children[0].children
+    let cached = cache[this.path]
+
+    if(cached)
+      return cached
+  }
+
+  getHeadingNodes () {
+    return getChildren().filter(node => node.type === "heading")
   }
 
   runHook (identifier = "", ...args) {
@@ -96,8 +111,10 @@ function process (document) {
 
   document.ast = parse(document)
   document.runHook("documentWillRender", document.ast)
+ 
+  let children = cache[document.path] = document.ast.children
 
-  applyWrapper(document.ast, document.id, (document.options.wrapperClass || "wrapper")) 
+  applyWrapper(document.ast, children, document.id, (document.options.wrapperClass || "wrapper")) 
 
   document.html = stringify(document)
   document.$ = cheerio.load(document.html)

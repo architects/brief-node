@@ -82,16 +82,18 @@ export default class ModelDefinition {
     return definitions
   }
 
-  static lookup (aliasOrName) {
+  static lookup (aliasOrName, singular = false) {
     if(definitions[aliasOrName]){
       return definitions[aliasOrName]
     }
     
     let name = type_aliases[aliasOrName]
     
-    if(name && definitions[name]){
+    if(name && definitions[name])
       return definitions[name]
-    }
+
+    if(singular == true)
+      return lookup(inflections.singularize(aliasOrName, true))
   }
 
   constructor (name = "Document") {
