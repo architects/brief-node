@@ -16,9 +16,9 @@ describe "The Document", ->
   it "renders the document in HTML", ->
     document.html.length.should.be.above(10)
 
-  it "wraps the document in a wrapper div", ->
-    document.html.should.match(/\<div/)
-    document.html.should.match(/wrapper/)
+  it "wraps the document in a main tag", ->
+    document.html.should.match(/\<main/)
+    document.html.should.match(/brief-document/)
 
   it "stores a reference to the markdown ast", ->
     document.should.have.property('ast')
@@ -31,6 +31,7 @@ describe "The Document", ->
     document.$('h3').length.should.equal(3)
 
   it "wraps elements in sections and articles", ->
+    document.$('main').length.should.equal(1)
     document.$('section').length.should.equal(2)
     document.$('article').length.should.equal(3)
 

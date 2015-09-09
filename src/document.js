@@ -210,11 +210,11 @@ function collapseSections (document){
 
 function applyWrapper (document) {
   document.ast.children = [{ 
-    type: "strong",
+    type: "unknown",
     data:{
-      htmlName: "div",
+      htmlName: "main",
       htmlAttributes:{
-        "class": "wrapper"
+        "class": "brief-document"
       }
     },
     children: document.ast.children
