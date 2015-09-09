@@ -18,5 +18,10 @@ run_specs:
 		--reporter spec \
 		test/**/*-spec.*
 
+console: compile
+	coffee --interactive \
+		--require babel/register \
+		--require ./test/console
+
 compile:
 	babel -q -d lib src

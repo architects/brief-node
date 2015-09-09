@@ -57,8 +57,9 @@ export default class Document {
     return this.html ? this.html : process(this) 
   }
 
-  present (options={}) {
-    return Presenter.present(this, options)
+  present (method, options={}) {
+    let presenter = Presenter.present(this, options)
+    return presenter[method]()
   }
 
   visit(type, iterator) {
@@ -74,7 +75,7 @@ export default class Document {
   }
 
   getHeadingNodes () {
-    return getChildren().filter(node => node.type === "heading")
+    return this.getChildren().filter(node => node.type === "heading")
   }
 
   runHook (identifier = "", ...args) {
@@ -107,17 +108,9 @@ function process (document) {
   document.ast = parse(document)
   document.runHook("documentWillRender", document.ast)
   
-  document.ast.children = [{ 
-    type: "link",
-    data:{
-      htmlName: "div",
-      htmlAttributes:{
-        "class": "wrapper"
-      }
-    },
-    children: document.ast.children
-  }]
-  
+  nestElements(document)
+  applyWrapper(document)
+
   document.html = stringify(document)
   document.$ = cheerio.load(document.html)
   document.runHook("documentDidRender", document.html)
@@ -131,4 +124,31 @@ function stringify (document, options={}) {
 
 function readPath(path) {
   return fs.readFileSync(path).toString()
+}
+
+function nestElements (document) {
+  let children = document.ast.children
+
+  let parent, previous
+
+  children.forEach(child => {
+    if(previous)
+      child.parentHeading = previous.headingIndex
+    
+    if(child.type === "heading")
+      previous = child
+  })
+}
+
+function applyWrapper (document) {
+  document.ast.children = [{ 
+    type: "paragraph",
+    data:{
+      htmlName: "div",
+      htmlAttributes:{
+        "class": "wrapper"
+      }
+    },
+    children: document.ast.children
+  }]
 }
