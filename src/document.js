@@ -73,7 +73,22 @@ export default class Document {
   }
 
   getHeadingNodes () {
-    return this.getChildren().filter(node => node.type === "heading")
+    let results = []
+    this.visit('heading', node => results.push(node))
+    return results
+  }
+  
+  /**
+  * Given a css selector, return each of the elements
+  *   wrapped with a cheerio object. 
+  *
+  * @param {string} selector - a css selector to match
+  * @return - an underscore wrapped array of elements
+  */
+  elements (...args) {
+    return _(this.$(...args).map((index,el)=>{
+      return cheerio(el)
+    }))
   }
 
   runHook (identifier = "", ...args) {
@@ -112,6 +127,8 @@ function process (document) {
 
   document.html = stringify(document)
   document.$ = cheerio.load(document.html)
+
+
   document.runHook("documentDidRender", document.html)
 
   return document
@@ -143,7 +160,7 @@ function nestElements (document) {
       data = data || {}
       data.htmlName = "section"
       data.htmlAttributes = data.htmlAttributes || {}
-      
+
       if(child.depth >= 3){
         data.htmlName = "article"
       }

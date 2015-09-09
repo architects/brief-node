@@ -3,8 +3,11 @@ define("Epic")
 attributes(
   "title", 
   "status", 
-  "project"
+  "project",
+  "subheading"
 )
+
+attribute("subheading").extract("main h2")
 
 section("Features")
   .aka("Stories", "User Stories")

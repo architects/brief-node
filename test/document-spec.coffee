@@ -33,3 +33,9 @@ describe "The Document", ->
   it "wraps elements in sections and articles", ->
     document.$('section').length.should.equal(2)
     document.$('article').length.should.equal(3)
+
+  it "lets me query the document using css and underscore", ->
+    headings = document.elements('section article h3').invoke('text')
+    headings.should.containEql('A User can describe the metadata schema')
+    headings.should.containEql('A User can define attributes using CSS selectors')
+

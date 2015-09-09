@@ -26,7 +26,26 @@ export default class Model {
     return this.document.path
   }
   
-  getModelDefinition(){
+  extractContent() {
 
+  }
+
+  extractData() {
+  }
+
+  getAttributeConfig(key) {
+    return getAttributesConfig()[key]
+  }
+
+  getAttributesConfig() {
+    return this.getModelDefinition().attributes
+  }
+
+  getSectionsConfig(){
+    return this.getModelDefinition().sections
+  }
+
+  getModelDefinition(){
+    return ModelDefinition.lookup(this.type)
   }
 }

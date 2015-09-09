@@ -27,6 +27,11 @@ const dsl = {
     return current.defineAttributes(list)
   },
 
+  attribute: function(name){
+    let current = ModelDefinition.last()
+    return current.attributes[name]
+  },
+
   section: function (name, options = {}) {
     let current = ModelDefinition.last()
     return current.defineSection(name, options)
@@ -47,6 +52,21 @@ const dsl_methods = [
   "actions",
   "close"
 ]
+
+
+class AttributeConfig {
+  constructor(config){
+    for(var key in config){
+      this[key] = config[key]
+    }
+  }
+
+  extract(selector){
+    this.extraction = this.extraction || {}
+    this.extraction.selector = selector
+    return this
+  }
+}
 
 export default class ModelDefinition {
   static setupDSL () {
@@ -135,9 +155,17 @@ export default class ModelDefinition {
   /**
    * returns the attribute names as an array
   */
-  attributeNames () {
-    return Object.keys(this.attributes)
+  attributeNames() {
+    return Object.values(this.attributes).map(attr => attr.name)
   }
+  
+  /**
+   * returns the attributes which are configured for extraction
+  */
+  extractions() {
+    return Object.values(this.attributes).filter(attr => attr.extraction)
+  }
+
   /** 
    * defines attributes for the model's metadata
   */
@@ -146,7 +174,7 @@ export default class ModelDefinition {
       if(typeof(attr) === "string")
         attr = {name: attr}
       
-      this.attributes[attr.name] = attr
+      this.attributes[attr.name] = new AttributeConfig(attr)
     })
 
     return this

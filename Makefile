@@ -1,3 +1,13 @@
+run_specs: compile
+	@./node_modules/mocha/bin/mocha \
+		--require should \
+		--require 'babel/register' \
+		--require './test/test-helper' \
+		--compilers js:mocha-babel \
+		--compilers coffee:coffee-script/register \
+		--reporter spec \
+		test/**/*-spec.*
+
 run_specs_vimsafe:
 	@./node_modules/mocha/bin/mocha \
 		--require should \
@@ -6,16 +16,6 @@ run_specs_vimsafe:
 		--compilers js:mocha-babel \
 		--compilers coffee:coffee-script/register \
 		--reporter min \
-		test/**/*-spec.*
-
-run_specs:
-	@./node_modules/mocha/bin/mocha \
-		--require should \
-		--require 'babel/register' \
-		--require './test/test-helper' \
-		--compilers js:mocha-babel \
-		--compilers coffee:coffee-script/register \
-		--reporter spec \
 		test/**/*-spec.*
 
 console: compile
