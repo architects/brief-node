@@ -1,4 +1,5 @@
 import string from 'underscore.string'
+import html from 'html'
 
 export default class Presenter {
 	static present (document, options={}) {
@@ -34,8 +35,18 @@ export default class Presenter {
     if(nextHeading)
       return nextHeading
   }
+  
+  prettified () {
+    let pretty = require('html').prettyPrint(this.document.render())
 
-	viewHeadings (){
+    if(this.output === "console"){
+      console.log(pretty)
+    } else {
+      return(pretty)
+    }
+  }
+
+	viewHeadings () {
 		let base = ""
 		let indentation = ""
 		let headings = this.document.getHeadingNodes()

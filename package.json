@@ -41,13 +41,14 @@
     "babel-runtime": "^5.8.20",
     "coffee-script": "^1.10.0",
     "colors": "latest",
+    "html": "0.0.10",
     "mocha": "^2.3.0",
     "mocha-babel": "^3.0.0",
     "node-inspector": "latest",
     "should": "^7.1.0",
     "underscore.string": "latest"
   },
-  "babel":{
+  "babel": {
     "sourceMaps": "inline"
   }
 }

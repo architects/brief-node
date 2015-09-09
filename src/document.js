@@ -4,17 +4,15 @@ import yaml from 'mdast-yaml'
 import html from 'mdast-html'
 import Model from './model'
 import Presenter from "./presenter"
-import structure from './structure'
 import squeeze from 'mdast-squeeze-paragraphs'
 import normalize from 'mdast-normalize-headings' 
 import cheerio from 'cheerio'
 import _ from 'underscore'
 import visit from 'mdast-util-visit'
-import inflect from 'i'
+import inflections from 'underscore.string'
 
 
-const processor = mdast.use([yaml,squeeze,normalize,structure, html])
-const inflections = inflect()
+const processor = mdast.use([yaml,squeeze,normalize,html])
 
 export default class Document {
   toString() {
@@ -109,6 +107,7 @@ function process (document) {
   document.runHook("documentWillRender", document.ast)
   
   nestElements(document)
+  collapseSections(document)
   applyWrapper(document)
 
   document.html = stringify(document)
@@ -128,21 +127,73 @@ function readPath(path) {
 
 function nestElements (document) {
   let children = document.ast.children
+  let headings = document.ast.children.filter(c => c.type === "heading")
+	
+	let index = 0
+	let previous
 
-  let parent, previous
+	children.forEach(child => {
+		let data = child.data 
+
+		if(child.type === "heading"){
+			delete(child.data)
+      
+      let text = child.children[0] && child.children[0].value
+
+      data = data || {}
+      data.htmlName = "section"
+      data.htmlAttributes = data.htmlAttributes || {}
+      
+      if(child.depth >= 3){
+        data.htmlName = "article"
+      }
+
+      if(text){
+        data.htmlAttributes['data-heading'] = inflections.dasherize(text.toLowerCase())
+      }
+
+			previous = children[index] = {
+				type: "div",
+        depth: child.depth,
+				headingIndex: child.headingIndex,
+				container: true,
+				data: data,
+				children: [child]
+			}
+		} else if(previous) {
+			previous.children.push(_.clone(child))
+			child.markForRemoval = true
+		}
+
+		index = index + 1
+	})
+  
+  document.ast.wrapped = true
+	document.ast.children = children.filter(child => !child.markForRemoval)
+}
+
+function collapseSections (document){
+  let children = document.ast.children
+  let previous
 
   children.forEach(child => {
-    if(previous)
-      child.parentHeading = previous.headingIndex
-    
-    if(child.type === "heading")
+    let name = child.data.htmlName
+    if(name === "section"){
       previous = child
+    }
+
+    if(previous && name === "article"){
+      previous.children.push(_.clone(child))
+      child.markForDelete = true
+    }
   })
+
+  document.ast.children = children.filter(child => !child.markForDelete)
 }
 
 function applyWrapper (document) {
   document.ast.children = [{ 
-    type: "paragraph",
+    type: "strong",
     data:{
       htmlName: "div",
       htmlAttributes:{

@@ -25,12 +25,11 @@ describe "The Document", ->
     document.ast.should.have.property('type')
     document.ast.should.have.property('children')
 
-  it "attaches special attributes to the headings", ->
-    document.visit 'heading', (node)->
-      node.data.should.have.property('htmlAttributes')
-      node.data.htmlAttributes.should.have.property('data-line-number')
-
   it "has an css selecting interface", ->
     document.$('h1').length.should.equal(1)
     document.$('h2').length.should.equal(1)
     document.$('h3').length.should.equal(3)
+
+  it "wraps elements in sections and articles", ->
+    document.$('section').length.should.equal(2)
+    document.$('article').length.should.equal(3)
