@@ -8,14 +8,14 @@ run_specs: compile
 		--reporter spec \
 		test/**/*-spec.*
 
-run_specs_vimsafe:
+spec:
 	@./node_modules/mocha/bin/mocha \
 		--require should \
 		--require 'babel/register' \
 		--require './test/test-helper' \
 		--compilers js:mocha-babel \
 		--compilers coffee:coffee-script/register \
-		--reporter min \
+		--reporter spec \
 		test/**/*-spec.*
 
 console: compile
