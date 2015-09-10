@@ -1,3 +1,6 @@
+fs  = require('fs')
+Zip = require('adm-zip')
+
 describe "The Briefcase", ->
   epic = briefcase.at "epics/model-definition-dsl"
 
@@ -19,3 +22,20 @@ describe "The Briefcase", ->
 
   it "provides access to all of the models", ->
     briefcase.getAllModels().length.should.be.above(0)
+
+  it "provides a manifest of files inside of it", ->
+    files = briefcase.getAllFiles()
+    files.should.containEql 'docs/epics/model-definition-dsl.md', 'index.js'
+
+  it "has a name", ->
+    briefcase.name.should.equal 'example'
+
+  it "has a parent folder", ->
+    briefcase.parentFolder.should.match /test$/
+
+  it "archives the contents of the briefcase in a zip", ->
+    briefcase.archive("/tmp/example.briefcase")
+    fs.existsSync("/tmp/example.briefcase").should.equal(true)
+    zip = new Zip("/tmp/example.briefcase")
+    zip.getEntries().map((e) => e.entryName).should.containEql 'index.js', 'models/epic.js', 'docs/projects/brief.md', 'docs/epics/model-defintion-dsl.md'
+    fs.unlinkSync("/tmp/example.briefcase")

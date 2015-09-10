@@ -1,12 +1,15 @@
-Document = require("../src/document")
-path = require.resolve("./example/docs/epics/model-definition-dsl.md")
-
 describe "The Document", ->
-  document = new Document(path)
+  document = briefcase.epics.first().document
+
+  it "knows the type", ->
+    document.getType().should.equal('epic')
 
   it "Loads content from the path", ->
     length = document.content.length
     length.should.be.above(10)
+
+  it "has a relative path", ->
+    document.relative_path.should.equal('docs/epics/model-definition-dsl.md')
 
   it "extracts data from the frontmatter", ->
     document.data.title.should.equal('Model Definition DSL')
