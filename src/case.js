@@ -4,6 +4,7 @@ import Document from './document'
 import Model from './model'
 import ModelDefinition from './model_definition'
 import inflections from 'i'
+import Packager from './packager'
 import _ from 'underscore'
 
 const inflect = inflections(true)
@@ -30,7 +31,10 @@ export default class Case {
    * @param {path} assets_path - which folder contains the assets to use if any.
   */
   constructor(root, options) {
-    this.root = path.resolve(root)
+    this.root         = path.resolve(root)
+    this.name         = options.name || path.basename(root)
+    this.parentFolder = path.dirname(root)
+
     this.options = options || {}
 
     this.index = {}
@@ -101,16 +105,23 @@ export default class Case {
    * returns all the models in this briefcase
   */
   getAllModels() {
-    return _(this.index).values()
+    return Object.values(this.index)
   }
   
   /**
    * returns the raw documents in this briefcase
   */
   getAllDocuments () {
-    return this.getAllModels(model => model.document)
+    return this.getAllModels().map(model => model.document)
   }
   
+  archive(location, ignore=[]) {
+    location = location || 
+    ignore.push(location)
+
+    new Packager(this, ignore).persist(location)
+  }
+
   getGroupNames () {
     let pluralize = inflect.pluralize
     let types = this.getDocumentTypes()
@@ -122,7 +133,7 @@ export default class Case {
     let types = []
 
     this.getAllDocuments().forEach((doc)=>{
-      types.push(doc.data.type)
+      types.push(doc.getType())
     })
 
     return _(types).uniq()
@@ -152,12 +163,17 @@ export default class Case {
   getModelSchema () {
     return ModelDefinition.getModelSchema()
   }
-  
+
+  getAllFiles(useAbsolutePaths=false){
+    let allFiles = glob.sync(path.join(this.root, '**/*'))
+    return useAbsolutePaths ? allFiles : allFiles.map(f => f.replace(this.root + '/', ''))
+  }
+ 
   _createCollections() {
     let groups = this.getGroupNames()
     groups.forEach(group => this[group] = _(this.selectModelsByGroup(group)))
   }
-
+  
   _getDocumentPaths() {
     let docs_path = path.resolve(this.config.docs_path)
     return glob.sync(path.join(docs_path,'**/*.md'))
@@ -183,6 +199,9 @@ export default class Case {
       let document = new Document(path, {id: id})
       let model = document.toModel({id: id}) 
       
+      
+      document.id = path_alias
+      document.relative_path = 'docs/' + path_alias
       model.id = id
       model.getParent = ()=>{ 
         return this
