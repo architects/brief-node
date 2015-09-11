@@ -1,24 +1,83 @@
----
-title: 'Brief: The Active Writing Framework.'
----
-
 # Brief: The Active Writing Framework
 
-Brief lets people build applications on top of their writing.  Whether
-you are a chef who is writing recipes for the kitchen, or you are a
-system administrator writing chef recipes to automate your servers,
+Markdown is great for writers who want to present their writing in
+a neatly formatted way. Brief builds on top of Markdown's usefulness
+as a presentation format and communication tool, by providing an easy way to 
+build database applications and custom functionality on top of collections 
+of markdown documents.
 
-Brief lets you use your natural communication and writing in powerful
-ways. A little bit of markdown can go a long way.  Not only can the
-writing be rendered into HTML as you would expect, but it can be treated
-as a database to display a variety of different views based on the
-information contained in the writing.
+Brief lets you use YAML frontmatter, and a simple system for defining
+attributes as CSS selectors to add a queryable data object layer on top
+of these collections.  It also lets you treat individual documents as
+objects, with a set of attributes that you can change in code.  These
+updates will get saved in your markdown.
+
+This lets you render the document as simple HTML as you might normally
+do, but also as JSON so that you can treat the content as data as well. 
+
+## Getting Started
+
+```
+npm install brief-node
+brief use sample project
+```
+
+This will create a sample project.  Our example will use a cookbook.
+
+```
+- assets
+  - images
+    - breakfast.svg
+    - syrup.jpg
+- docs
+  - cookbooks
+    - breakfast.md
+  - ingredients
+    - artisinal-butter.md
+    - small-batch-syrup.md
+  - recipes
+    - french-toast.md
+- models
+  - recipe.js
+  - ingredient.js
+  - cookbook.js
+- index.js
+```
+
+## Interacting via the CLI tool
+
+```
+cd sample
+brief write recipe # => Opens in $EDITOR
+brief publish recipe # => Publishes the recipe somewhere 
+```
+
+## Interacting via JSON 
+
+```javascript
+var cookbook = require('./path/to/cookbook')()
+
+var syrup = cookbook.ingredients.find_by_name('Artisinal Butter')
+
+if(syrup.inStock < 5) { grocery_store_api.place_order(syrup) }
+
+var menu = new Menu()
+
+cookbook.recipes.forEach(recipe => {
+  menu.addItem(recipe)
+})
+
+menu.saveAsPDF()
+menu.publishToMyWebsite()
+```
+
+This lets a chef use markdown files that contain writing and notes about his recipes and ingredients to a) generate menu PDFs b) publish the menu to his website c) order ingredients which are almost out of stock.
 
 ## Briefcases.
 
 Briefcases are collections of related documents.  These documents can
 be of varying types.  Each type of Document will be backed by a Model
-class which allow you to do things to the document such as update
+class which allows you to do things to the document such as update
 attributes about it, generate reports, or use the content and data in
 that document to interact with different APIs. 
 
@@ -69,3 +128,7 @@ present.
 The Model System allows you to generate reports, visualizations, or
 develop integrations between the different instances of models and
 various APIs that you can work with from within Javascript.
+
+### Acknowledgements
+
+- Titus Woormer (@wooorm) for his work on MDast

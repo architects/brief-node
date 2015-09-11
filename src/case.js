@@ -22,16 +22,19 @@ export default class Case {
   }
  
   /**
-   * Create a new Briefcase object at the specified root path.
-   *
-   * @param {path} root - the root path of the briefcase. expects
-   *   to find a config file "brief.config.js", and at least a 
-   *   documents folder.
-   *
-   * @param {options} options - options to override default behavior.
-   * @param {path} docs_path - which folder contains the documents.
-   * @param {path} models_path - which folder contains the models to use.
-   * @param {path} assets_path - which folder contains the assets to use if any.
+  */
+
+  /**
+  * Create a new Briefcase object at the specified root path.
+  *
+  * @param {path} root - the root path of the briefcase. expects
+  *   to find a config file "brief.config.js", and at least a 
+  *   documents folder.
+  *
+  * @param {options} options - options to override default behavior.
+  * @param {path} docs_path - which folder contains the documents.
+  * @param {path} models_path - which folder contains the models to use.
+  * @param {path} assets_path - which folder contains the assets to use if any.
   */
   constructor(root, options) {
     this.root         = path.resolve(root)
