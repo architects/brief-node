@@ -10,14 +10,17 @@ import _ from 'underscore'
 const inflect = inflections(true)
 
 export default class Case {
-  static load(root, options={}) {
-    return new Case(root,options)
+  /**
+  * Load a briefcase by passing a path to a root folder.
+  *
+  * @param {string} rootPath - the root path of the briefcase.
+  * @return {Case} - returns a briefcase
+  *
+  */
+  static load(rootPath, options={}) {
+    return new Case(rootPath,options)
   }
-  
-  toString(){
-    return this.root
-  }
-  
+ 
   /**
    * Create a new Briefcase object at the specified root path.
    *
@@ -57,14 +60,27 @@ export default class Case {
    * @example
    *  briefcase.at('epics/model-definition-dsl')
   */
-  at (path_alias) {
+  at(path_alias, absolute=false) {
+    let docs_path = path.resolve(this.config.docs_path)
+
+    if(absolute){ path_alias = path_alias.replace(docs_path, '') }
+
     if(!path_alias.match(/\.md$/i)){
       path_alias = path_alias + '.md' 
     }
 
-    return this.index[path_alias]
+    return this.index[path_alias.replace(/^\//,'')]
   }
-  
+    
+  /**
+  * get models at each of the paths represented
+  * by the glob pattern passed here.
+  */
+  glob(pattern="**/*.md") {
+    let matchingFiles = glob.sync(path.join(this.root, pattern))
+    return matchingFiles.map(path => this.at(path,true)) 
+  }
+
   /**
    * filters all available models by the given iterator
    *
