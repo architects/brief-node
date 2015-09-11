@@ -9,16 +9,16 @@ import _ from 'underscore'
 
 const inflect = inflections(true)
 
-export default class Case {
+export default class Briefcase {
   /**
   * Load a briefcase by passing a path to a root folder.
   *
   * @param {string} rootPath - the root path of the briefcase.
-  * @return {Case} - returns a briefcase
+  * @return {Briefcase} - returns a briefcase
   *
   */
   static load(rootPath, options={}) {
-    return new Case(rootPath,options)
+    return new Briefcase(rootPath,options)
   }
  
   /**

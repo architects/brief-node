@@ -1,15 +1,15 @@
 import path from 'path'
-import Case from "./case"
+import Briefcase from "./briefcase"
 import Model from "./model"
 import Document from "./document"
 import ModelDefinition from "./document"
 
 let brief = {
-  Case: Case,
+  Briefcase: Briefcase,
   Model: Model,
   ModelDefinition: ModelDefinition,
   load: function (root, options={}) {
-    return Case.load(root, options)
+    return Briefcase.load(root, options)
   },
   example: function(options={}){
     return require("../test/example")()

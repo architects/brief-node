@@ -1,6 +1,6 @@
 import Document from './document'
 import ModelDefinition from './model_definition'
-import Case from './case'
+import Briefcase from './briefcase'
 import inflect from 'i'
 
 export default class Model {
