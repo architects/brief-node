@@ -23,7 +23,7 @@
   "homepage": "https://github.com/architects/brief-node#readme",
   "dependencies": {
     "commander": "^2.0.0",
-    "chalk": "^1.0.0", 
+    "chalk": "^1.0.0",
     "debug": "^2.0.0",
     "mdast": "^1.2.0",
     "mdast-yaml": "^1.0.0",

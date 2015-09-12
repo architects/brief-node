@@ -1,7 +1,9 @@
 import Document from './document'
 import ModelDefinition from './model_definition'
 import Briefcase from './briefcase'
-import inflect from 'i'
+import {fragment} from './render'
+
+const flatten = _.flatten
 
 export default class Model {
   static fromDocument (document){
@@ -23,16 +25,23 @@ export default class Model {
   }
 
   toString(){
-    return this.document.path
+    return 'Document: ' + this.document.path
   }
-  
+
+  toJSON(options={}) {
+    return {
+      data: this.data
+    }
+  }
+
   extractContent() {
 
   }
 
   extractData() {
-  }
 
+  }
+  
   getAttributeConfig(key) {
     return getAttributesConfig()[key]
   }

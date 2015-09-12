@@ -40,7 +40,7 @@ export default class Presenter {
     let pretty = require('html').prettyPrint(this.document.render())
 
     if(this.output === "console"){
-      console.log(pretty)
+      console.log(highlight(pretty))
     } else {
       return(pretty)
     }

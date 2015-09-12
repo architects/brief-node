@@ -12,6 +12,7 @@ export default class DocumentSection {
    * should be extracted from the subsection
   */
   hasMany (relationshipName, options = {}) {
+    options.relationshipType = "hasMany"
     this.children[relationshipName] = options
     return this
   }

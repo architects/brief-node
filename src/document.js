@@ -5,7 +5,8 @@ import visit from 'mdast-util-visit'
 
 import Model from './model'
 import Presenter from "./presenter"
-import {process, parse} from './render'
+import {process, parse, wrapInDom} from './render'
+import {clone} from './util'
 
 export default class Document {
   toString() {
@@ -78,7 +79,7 @@ export default class Document {
     visit(this.ast, type, iterator)
   }
 
-  getAst () {
+  getAST () {
     return this.ast
   }
 
@@ -91,30 +92,32 @@ export default class Document {
     process(this)
   }
   
+  getSectionHeadings(){
+    return this.getSectionNodes().map(section => section.heading)
+  }
+
+  getArticleHeadings(){
+    return this.getArticleNodes().map(article => article.heading)
+  }
+
   getTopSection() {
-    return this.getSectionNodes()[0]
+    return this.getSectionNodes().find(node => node.top)
   }
 
   getSectionNodes() {
-    if(this.sections){
-      return this.sections
-    }
+    if(this.sections){ return this.sections }
+
     this.sections = []
     this.visit('section', node => this.sections.push(node))
-    return this.sections
+    return this.sections = this.sections.reverse()
   }
 
   getArticleNodes() {
-    if(this.articles){
-      return this.articles
-    }
+    if(this.articles){ return this.articles }
+
     this.articles = []
     this.visit('article', node => this.articles.push(node))
-    return this.articles
-  }
-
-  getTopSectionNode() {
-    
+    return this.articles = this.articles.reverse()
   }
 
   getChildren () {

@@ -17,6 +17,11 @@ describe "The Briefcase", ->
     types.should.containEql('epics')
     types.should.containEql('projects')
 
+  it "can access documents via a glob interface", ->
+    briefcase.glob("**/*.md").length.should.be.above(2)
+    briefcase.glob("**/model-definition*").length.should.equal(1)
+    model = briefcase.glob("**/model-definition*")[0].title.should.equal('Model Definition DSL')
+
   it "provides access to all of the documents", ->
     briefcase.getAllDocuments().length.should.be.above(0)
 
@@ -32,10 +37,3 @@ describe "The Briefcase", ->
 
   it "has a parent folder", ->
     briefcase.parentFolder.should.match /test$/
-
-  it "archives the contents of the briefcase in a zip", ->
-    briefcase.archive("/tmp/example.briefcase")
-    fs.existsSync("/tmp/example.briefcase").should.equal(true)
-    zip = new Zip("/tmp/example.briefcase")
-    zip.getEntries().map((e) => e.entryName).should.containEql 'index.js', 'models/epic.js', 'docs/projects/brief.md', 'docs/epics/model-defintion-dsl.md'
-    fs.unlinkSync("/tmp/example.briefcase")

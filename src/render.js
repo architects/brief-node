@@ -4,20 +4,18 @@ import html from 'mdast-html'
 import fs from 'fs'
 import squeeze from 'mdast-squeeze-paragraphs'
 import normalize from 'mdast-normalize-headings' 
-import _ from 'underscore'
 import visit from 'mdast-util-visit'
-import inflections from 'underscore.string'
-import cheerio from 'cheerio'
+import domino from 'domino'
+import {clone,slugify} from './util'
 
 const processor = mdast.use([yaml,squeeze,normalize,html])
-const clone = _.clone
 
 export function parse(document) {
   let parsed = processor.parse(document.content),
       nodes  = parsed.children
   
   if(nodes[0] && nodes[0].yaml){
-    document.data = nodes.splice(0,1)[0].yaml
+    document.data = nodes.shift().yaml
   }
   
   let ast = processor.run(parsed)
@@ -37,16 +35,25 @@ export function process(document) {
   collapseSections(document)
   applyWrapper(document)
 
-  document.html = stringify(document)
-  document.$ = cheerio.load(document.html)
+  document.html = stringify(document.ast)
+  document.$ = function(selector){
+    return wrapInDom(document.html).querySelectorAll(selector)
+  }
 
   document.runHook("documentDidRender", document.html)
 
   return document
 }
 
-function stringify(document, options={}) {
-  return processor.stringify(document.ast, options)
+export function fragment(ast, options={}) {
+  return stringify({
+    type: 'root',
+    children: [ast]
+  })
+}
+
+export function stringify(ast, options={}) {
+  return processor.stringify(ast, options)
 }
 
 function readPath(path) {
@@ -96,19 +103,19 @@ function nestElements(document) {
         wrapped.top = top
       }
 
-      let text = child.children[0] && child.children[0].value
-      let slug
-
-      if(text){
-        slug = inflections.dasherize(text.toLowerCase())
+      if(child.type == "heading"){
+        let text = child.children[0] && child.children[0].value
+        let slug = slugify(text) 
         data.htmlAttributes['data-heading'] = slug
         wrapped.slug = slug
+        wrapped.heading = text
+        child.heading = text
       }
 
       previous = children[index] = wrapped
 
 		} else if(previous) {
-			previous.children.push(_.clone(child))
+			previous.children.push(clone(child))
 			child.markForRemoval = true
 		}
 
@@ -122,16 +129,19 @@ function nestElements(document) {
 function collapseSections (document){
   let children = document.ast.children
   let previous
-
+   
   children.forEach(child => {
     let name = child.data && child.data.htmlName
     if(name === "section"){
       previous = child
+      child.debug = true
       child.section = true
     }
 
     if(previous && name === "article"){
-      previous.children.push(clone(child))
+      let cloned = clone(child)
+      cloned.parent = previous.slug
+      previous.children.push(cloned)
       child.markForDelete = true
     }
   })
