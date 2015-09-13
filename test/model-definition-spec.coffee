@@ -23,7 +23,3 @@ describe "Model Definitions", ->
 
   it "should define some attributes", ->
     definition.attributeNames().should.containEql('title','status','project')
-
-  it "should be findable by an alias", ->
-
-  it "should create a model prototype", ->
