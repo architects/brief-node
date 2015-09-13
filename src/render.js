@@ -5,7 +5,7 @@ import fs from 'fs'
 import squeeze from 'mdast-squeeze-paragraphs'
 import normalize from 'mdast-normalize-headings' 
 import visit from 'mdast-util-visit'
-import domino from 'domino'
+import cheerio from 'cheerio'
 import {clone,slugify} from './util'
 
 const processor = mdast.use([yaml,squeeze,normalize,html])
@@ -37,7 +37,7 @@ export function process(document) {
 
   document.html = stringify(document.ast)
   document.$ = function(selector){
-    return wrapInDom(document.html).querySelectorAll(selector)
+    return cheerio.load(document.html)(selector)
   }
 
   document.runHook("documentDidRender", document.html)

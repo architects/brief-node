@@ -3,6 +3,7 @@ import fs from 'fs'
 import _ from 'underscore'
 import DocumentSection from './document_section'
 import Model from './model'
+import Collection from './collection'
 
 const inflections = inflect()
 
@@ -109,11 +110,13 @@ export default class ModelDefinition {
     
     let name = type_aliases[aliasOrName]
     
-    if(name && definitions[name])
+    if(name && definitions[name]){
       return definitions[name]
+    }
 
-    if(singular == true)
+    if(singular == true){
       return lookup(inflections.singularize(aliasOrName, true))
+    }
   }
 
   constructor (name = "Document") {
@@ -131,6 +134,24 @@ export default class ModelDefinition {
   
   static getTypeAliases(){
     return Object.keys(type_aliases)
+  }
+  
+  toCollectionPrototype() {
+    let collection = function(){ }
+    let definition = this
+    let attributeNames = Object.keys(this.attributes)
+
+    collection.prototype = Collection
+
+    
+    for(var name in attributeNames){
+      let finderName = inflections.camelize('find_by_' + name, false)
+      collection[finderName] = function(needle){
+        this.models.find(model => model[name] == needle)
+      }
+    }
+
+    return collection
   }
 
   toPrototype () {

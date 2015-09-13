@@ -1,9 +1,13 @@
+import _ from 'underscore'
+import inflect from 'i'
+
 import Document from './document'
 import ModelDefinition from './model_definition'
 import Briefcase from './briefcase'
 import {fragment} from './render'
 
 const flatten = _.flatten
+const string = inflect()
 
 export default class Model {
   static fromDocument (document){
@@ -18,7 +22,7 @@ export default class Model {
     this.document.id  = this.id
 
     if(this.data.type){
-      this.groupName = inflect().pluralize(this.data.type)
+      this.groupName = string.pluralize(this.data.type)
     }
     
     Object.keys(this.data).forEach(key => this[key] = this.data[key])
@@ -42,6 +46,12 @@ export default class Model {
 
   }
   
+  definedSectionNodes(){
+    return this.document.getSectionNodes().filter(node => {
+      return this.expectedSectionHeadings().indexOf(node.heading) >= 0
+    })
+  }
+
   getAttributeConfig(key) {
     return getAttributesConfig()[key]
   }
@@ -54,7 +64,13 @@ export default class Model {
     return this.getModelDefinition().sections
   }
 
+  expectedSectionHeadings(){
+    const cfg = this.getSectionsConfig()
+    return flatten(Object.values(cfg).map(def => [def.name, def.aliases]))
+  }
+
   getModelDefinition(){
     return ModelDefinition.lookup(this.type)
   }
+
 }

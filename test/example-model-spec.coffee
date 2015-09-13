@@ -15,10 +15,6 @@ describe "An Example Model Instance", ->
     json = epic.toJSON()
     json.data.title.should.equal('Model Definition DSL')
 
-  it "tells me if any sections are present", ->
-    epic.actualSectionHeadings().should.containEql 'Features'
-    epic.actualSectionHeadings().length.should.eql(1)
-
   it "tells me the expected section headings", ->
     headings = epic.expectedSectionHeadings()
     headings.should.containEql('Features','User Stories','Stories')

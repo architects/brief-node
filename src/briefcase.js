@@ -1,6 +1,7 @@
 import glob from 'glob-all'
 import path from 'path'
 import Document from './document'
+import collection from './collection'
 import Model from './model'
 import ModelDefinition from './model_definition'
 import inflections from 'i'
@@ -8,6 +9,7 @@ import Packager from './packager'
 import _ from 'underscore'
 
 const inflect = inflections(true)
+const pluralize = inflect.pluralize
 
 export default class Briefcase {
   /**
@@ -134,17 +136,23 @@ export default class Briefcase {
     return this.getAllModels().map(model => model.document)
   }
   
+  /**
+  * Archives the briefcase into a zip file. Briefcases
+  * can be created directly from zip files in the future.
+  *
+  * @param {string} location - where to store the file?
+  * @param {array} ignore - a list of files to ignore and not put in the
+  *   archive
+  */
   archive(location, ignore=[]) {
     location = location || 
     ignore.push(location)
 
     new Packager(this, ignore).persist(location)
   }
-
+  
   getGroupNames () {
-    let pluralize = inflect.pluralize
     let types = this.getDocumentTypes()
-    
     return types.map(type => pluralize(type || ""))
   }
 
@@ -189,10 +197,20 @@ export default class Briefcase {
   }
  
   _createCollections() {
-    let groups = this.getGroupNames()
-    groups.forEach(group => this[group] = _(this.selectModelsByGroup(group)))
+    const briefcase = this
+
+    this.getDocumentTypes().forEach(type => {
+      let group       = pluralize(type)
+      let definition  = this.getModelDefinition(type)
+
+      let fetch = ()=> {
+        return this.selectModelsByGroup(group)
+      }
+      
+      briefcase[group] = collection(fetch, definition) 
+    })
   }
-  
+ 
   _getDocumentPaths() {
     let docs_path = path.resolve(this.config.docs_path)
     return glob.sync(path.join(docs_path,'**/*.md'))

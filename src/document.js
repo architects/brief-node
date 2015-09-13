@@ -2,11 +2,12 @@ import fs from 'fs'
 import cheerio from 'cheerio'
 import _ from 'underscore'
 import visit from 'mdast-util-visit'
+import path from 'path'
 
 import Model from './model'
 import Presenter from "./presenter"
-import {process, parse, wrapInDom} from './render'
-import {clone} from './util'
+import {process, parse} from './render'
+import {clone, singularize} from './util'
 
 export default class Document {
   toString() {
@@ -17,10 +18,10 @@ export default class Document {
    * creates a new instance of the document at path
    * @param {path} path - the absolute path to the markdown document.
   */
-  constructor(path, options) {
+  constructor(pathname, options) {
     this.options = options || {}
-    this.path = path
-    this.dirname = require('path').dirname(this.path)
+    this.path = pathname
+    this.dirname = path.dirname(this.path)
 
     if(this.options.type){
       this.type = this.options.type
@@ -60,7 +61,7 @@ export default class Document {
       return this.data.type
     }
 
-    return this.dirname
+    return singularize(path.basename(this.dirname))
   }
   
   /** 
