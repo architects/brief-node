@@ -76,7 +76,10 @@ export default class Briefcase {
 
     return this.index[path_alias.replace(/^\//,'')]
   }
-    
+
+  findDocumentByPath(path){
+    return this.atPath(path_alias, true)
+  }
   /**
   * get models at each of the paths represented
   * by the glob pattern passed here.
