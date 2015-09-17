@@ -186,6 +186,11 @@ export default class Briefcase {
 
     return _(types).uniq()
   }
+  
+  loadModelDefinition(path){
+    let model = ModelDefinition.load(path)
+    this.loadModel(model)
+  }
 
   loadModel (definition) {
     this.model_definitions[definition.name] = definition
@@ -241,7 +246,7 @@ export default class Briefcase {
     let models_path = path.resolve(this.config.models_path)
     return glob.sync(path.join(models_path,'**/*.js'))
   }
-
+  
   _loadModelDefinitions(){
     this._getModelDefinitionFiles().forEach(file => ModelDefinition.load(file))
     ModelDefinition.getAll().forEach(definition => this.loadModel(definition))
