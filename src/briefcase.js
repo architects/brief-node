@@ -60,6 +60,17 @@ export default class Briefcase {
   }
   
   /**
+  * use a plugin to load modules, actions, CLI helpers, etc
+  */
+  use(plugin, options={}){
+    let brief = require("..")
+    let modifier = plugin(brief,options)
+    modifier(this, options)
+
+    return this
+  }
+
+  /**
    * get model at the given relative path 
    * 
    * @example
