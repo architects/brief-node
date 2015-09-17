@@ -8,6 +8,7 @@ import inflections from 'i'
 import Packager from './packager'
 import _ from 'underscore'
 
+
 const inflect = inflections(true)
 const pluralize = inflect.pluralize
 
@@ -44,7 +45,7 @@ export default class Briefcase {
     this.parentFolder = path.dirname(root)
 
     this.options = options || {}
-
+    
     this.index = {}
     this.model_definitions = {}
     
@@ -54,6 +55,14 @@ export default class Briefcase {
       assets_path: path.join(this.root, 'assets')
     }
     
+    this.setup()
+  }
+  
+  setup(){
+    require('./index').plugins.forEach(modifier => {
+      modifier(this)
+    })
+
     this._loadModelDefinitions()
     this._buildIndexFromDisk()
     this._createCollections()
@@ -63,10 +72,8 @@ export default class Briefcase {
   * use a plugin to load modules, actions, CLI helpers, etc
   */
   use(plugin, options={}){
-    let brief = require("..")
-    let modifier = plugin(brief,options)
-    modifier(this, options)
-
+    brief.use(plugin)
+    this.setup()
     return this
   }
 
