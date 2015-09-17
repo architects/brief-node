@@ -4,7 +4,7 @@ import html from 'mdast-html'
 import fs from 'fs'
 import squeeze from 'mdast-squeeze-paragraphs'
 import normalize from 'mdast-normalize-headings' 
-import visit from 'mdast-util-visit'
+import visit from 'unist-util-visit'
 import cheerio from 'cheerio'
 import {clone,slugify} from './util'
 

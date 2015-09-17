@@ -1,7 +1,7 @@
 import fs from 'fs'
 import cheerio from 'cheerio'
 import _ from 'underscore'
-import visit from 'mdast-util-visit'
+import visit from 'unist-util-visit'
 import path from 'path'
 
 import Model from './model'
