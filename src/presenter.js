@@ -1,5 +1,4 @@
 import string from 'underscore.string'
-import html from 'html'
 
 export default class Presenter {
 	static present (document, options={}) {
@@ -37,7 +36,13 @@ export default class Presenter {
   }
   
   prettified () {
-    let pretty = require('html').prettyPrint(this.document.render())
+    let pretty
+    
+    try {
+      pretty = require('html').prettyPrint(this.document.render())
+    } catch(e) {
+      pretty = this.document.render()
+    }
 
     if(this.output === "console"){
       console.log(pretty)
