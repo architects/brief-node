@@ -1,3 +1,7 @@
+describe "Model Classes", ->
+  it "creates classes for the model definitions", ->
+    epicModel = brief.model('Epic')
+
 describe "Model Collections", ->
   it "creates dynamic find by methods", ->
     epic = briefcase.epics.findByTitle('Model Definition DSL')
