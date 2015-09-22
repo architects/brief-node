@@ -4,11 +4,12 @@ import _ from 'underscore'
 import DocumentSection from './document_section'
 import Model from './model'
 import Collection from './collection'
+import registry from './model_registry'
 
 const inflections = inflect()
 
-const definitions = {}
-const type_aliases = {}
+const definitions = registry.models 
+const type_aliases = registry.aliases 
 
 const dsl = {
   close: function(){
@@ -136,6 +137,10 @@ export default class ModelDefinition {
     return Object.keys(type_aliases)
   }
   
+  actionNames(){
+    return Object.keys(this.actions)
+  }
+
   toCollectionPrototype() {
     let collection = function(){ }
     let definition = this

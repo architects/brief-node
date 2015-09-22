@@ -2,7 +2,8 @@ import path from 'path'
 import Briefcase from "./briefcase"
 import Model from "./model"
 import Document from "./document"
-import ModelDefinition from "./document"
+import ModelDefinition from "./model_definition"
+import {model, registry} from './model_registry'
 
 const plugins = []
 
@@ -11,6 +12,8 @@ let brief = {
   Briefcase: Briefcase,
   Model: Model,
   ModelDefinition: ModelDefinition,
+  registry: registry,
+  model: model,
   load: function (root, options={}) {
     return Briefcase.load(root, options)
   },

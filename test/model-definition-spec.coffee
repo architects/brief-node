@@ -1,4 +1,4 @@
-describe "Model Definitions", ->
+describe "A Model Definition", ->
   definition = briefcase.getModelDefinition('Epic')
 
   it "should load the model definitions", ->

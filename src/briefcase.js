@@ -187,13 +187,8 @@ export default class Briefcase {
     return _(types).uniq()
   }
   
-  loadModelDefinition(path){
-    let model = ModelDefinition.load(path)
-    this.loadModel(model)
-  }
-
   loadModel (definition) {
-    this.model_definitions[definition.name] = definition
+    this.model_definitions[definition.name] = true
     return definition
   }
 
