@@ -1,5 +1,16 @@
 fs  = require('fs')
 Zip = require('adm-zip')
+_ = require 'underscore'
+
+describe "Filtering", ->
+  it "filters by an arbitrary iterator", ->
+    briefcase.filterAll(()-> false).length.should.equal(0)
+
+  it "filters all the models by a given type", ->
+    models = briefcase.selectModelsByType('epic')
+    types = _.uniq _(models).pluck('type')
+    types.length.should.equal(1)
+    types[0].should.equal('epic')
 
 describe "The Briefcase", ->
   epic = briefcase.at "epics/model-definition-dsl"

@@ -114,7 +114,7 @@ export default class Briefcase {
    *  briefcase.filterAll(model => model.status === 'active')
   */
   filterAll (iterator) {
-    return this.getAllModels(iterator)
+    return this.getAllModels().filter(iterator)
   }
   
   /**
@@ -229,10 +229,10 @@ export default class Briefcase {
       let definition  = this.getModelDefinition(type)
 
       let fetch = ()=> {
-        return this.selectModelsByGroup(group)
+        return this.selectModelsByType(type)
       }
       
-      briefcase[group] = collection(fetch, definition) 
+      briefcase[group] = briefcase[group] || collection(fetch, definition) 
     })
   }
  

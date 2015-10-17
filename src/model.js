@@ -20,10 +20,9 @@ export default class Model {
     this.groupName    = options.groupName || "documents"
     this.id           = options.id
     this.document.id  = this.id
-
-    if(this.data.type){
-      this.groupName = string.pluralize(this.data.type)
-    }
+    
+    this.type = this.data.type || document.getType()
+    this.groupName = string.pluralize(this.type)
     
     Object.keys(this.data).forEach(key => this[key] = this.data[key])
   }

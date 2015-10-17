@@ -7,6 +7,8 @@ export default function collection(fetch, definition){
   let models = fetch()
 
   let object = _(models)
+  
+  if(!definition) { return object }
 
   definition.attributeNames().forEach(attribute => {
     let finder = inflections.camelize("find_by_" + attribute, false)    
