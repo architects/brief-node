@@ -1,6 +1,6 @@
 {
   "name": "brief-node",
-  "version": "2.6.1",
+  "version": "2.6.2",
   "description": "Brief.  The Active Writing Framework.",
   "main": "index.js",
   "scripts": {
@@ -40,7 +40,8 @@
     "js-yaml": "latest",
     "ware": "^1.3.0",
     "adm-zip": "latest",
-    "html": "0.0.10"
+    "html": "0.0.10",
+    "chokidar": "latest"
   },
   "devDependencies": {
     "babel": "^5.1.13",

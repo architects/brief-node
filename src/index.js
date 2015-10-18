@@ -1,4 +1,5 @@
 import path from 'path'
+import fs from 'fs'
 import Briefcase from "./briefcase"
 import Model from "./model"
 import Document from "./document"
@@ -6,8 +7,13 @@ import ModelDefinition from "./model_definition"
 import {model, registry} from './model_registry'
 
 const plugins = []
+const pluginNames = {}
+
+const pkg = path.join(__dirname, '../package.json')
+const manifest = JSON.parse(fs.readFileSync(pkg))
 
 let brief = {
+  VERSION: manifest.version,
   plugins: plugins,
   Briefcase: Briefcase,
   Model: Model,
@@ -30,8 +36,12 @@ let brief = {
     var modifier = plugin(this, options)
     modifier.version = plugin.version
     modifier.plugin_name = plugin.plugin_name
+    
+    if(!pluginNames[plugin.plugin_name]){
+      plugins.push(modifier)
+    }
 
-    plugins.push(modifier)
+    pluginNames[plugin.plugin_name] = true
 
     return this
   }
