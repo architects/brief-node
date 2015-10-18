@@ -4,6 +4,9 @@ describe "The Document", ->
   it "knows the type", ->
     document.getType().should.equal('epic')
 
+  it "can reference the briefcase it belongs to", ->
+    document.getBriefcase().should.have.property 'root'
+
   it "Loads content from the path", ->
     length = document.content.length
     length.should.be.above(10)

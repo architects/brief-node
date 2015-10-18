@@ -132,6 +132,11 @@ export default class Briefcase {
     return this.getAllModels().filter(iterator)
   }
   
+  findModelsByDefinition(definition){
+    let groupName = definition.groupName
+    return this.filterAll(model => model.groupName === groupName)
+  }
+   
   /**
    * filters models by the property and desired value
    * 
@@ -242,11 +247,11 @@ export default class Briefcase {
     this.getDocumentTypes().forEach(type => {
       let group       = pluralize(type)
       let definition  = this.getModelDefinition(type)
-
+      
       let fetch = ()=> {
         return this.selectModelsByType(type)
       }
-      
+
       briefcase[group] = briefcase[group] || collection(fetch, definition) 
     })
   }
@@ -264,6 +269,7 @@ export default class Briefcase {
   _loadModelDefinitions(){
     this._getModelDefinitionFiles().forEach(file => ModelDefinition.load(file))
     ModelDefinition.getAll().forEach(definition => this.loadModel(definition))
+    ModelDefinition.finalize()
   }
 
   _buildIndexFromDisk() {

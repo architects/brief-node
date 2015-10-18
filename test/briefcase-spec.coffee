@@ -48,3 +48,10 @@ describe "The Briefcase", ->
 
   it "has a parent folder", ->
     briefcase.parentFolder.should.match /test$/
+
+describe "Multiple Briefcases", ->
+  it "should provide access to the known instances", ->
+    brief.instances().length.should.not.equal 0
+
+  it "should lookup a briefcase by one of the paths it contains", ->
+    brief.findBriefcaseByPath(briefcase.root).name.should.equal 'example'

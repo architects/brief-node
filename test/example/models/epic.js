@@ -7,6 +7,8 @@ attributes(
   "subheading"
 )
 
+belongsTo("project", {references: "title"})
+
 attribute("subheading").extract("main h2")
 
 section("Features")

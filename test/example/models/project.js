@@ -5,4 +5,6 @@ attributes(
   "status"
 )
 
+hasMany("epics", {key: "title"})
+
 exports = close()

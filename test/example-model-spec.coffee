@@ -22,3 +22,6 @@ describe "An Example Model Instance", ->
   it "returns the nodes which have been defined as sections", ->
     epic.definedSectionNodes().length.should.eql(1)
 
+  it "lets me read a value even if it is a function", ->
+    epic.read('title').should.equal('Model Definition DSL')
+    epic.read('getBriefcase').should.not.equal(undefined)

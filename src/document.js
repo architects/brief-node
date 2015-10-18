@@ -4,6 +4,7 @@ import _ from 'underscore'
 import visit from 'unist-util-visit'
 import path from 'path'
 
+import brief from './index'
 import Model from './model'
 import Presenter from "./presenter"
 import {process, parse} from './render'
@@ -30,6 +31,12 @@ export default class Document {
     process(this)
   }
   
+  /**
+  * return a reference to the briefcase this document belongs to.
+  */
+  getBriefcase(){
+    return brief.findBriefcaseByPath(this.path)
+  }
   /**
    * get a model to represent this document and the data we parse from it.
    *

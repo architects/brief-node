@@ -1,6 +1,7 @@
 import inflect from 'i'
 import fs from 'fs'
 import _ from 'underscore'
+import brief from './index'
 import DocumentSection from './document_section'
 import Model from './model'
 import Collection from './collection'
@@ -33,6 +34,29 @@ const dsl = {
     let current = ModelDefinition.last()
     return current.attributes[name]
   },
+  
+  hasMany: function(relationship, options={}){
+    let current = ModelDefinition.last()
+    let config = current.relationships[relationship] = options
+
+    config.hasMany = true
+    config.belongsTo = false
+    config.type = "hasMany"
+    config.relationship = relationship
+    config.foreignKey = current.type_alias
+  },
+  
+  belongsTo: function(relationship, options={}){
+    let current = ModelDefinition.last()
+    let config = current.relationships[relationship] = options
+
+    config.hasMany = false
+    config.belongsTo = true
+    config.type = "belongsTo"
+    config.modelDefinition = ModelDefinition.lookup(relationship)
+    config.relationship = relationship
+    config.foreignKey = config.foreignKey || relationship
+  },
 
   section: function (name, options = {}) {
     let current = ModelDefinition.last()
@@ -52,7 +76,9 @@ const dsl_methods = [
   "section",
   "action",
   "actions",
-  "close"
+  "close",
+  "hasMany",
+  "belongsTo"
 ]
 
 
@@ -77,6 +103,10 @@ export default class ModelDefinition {
 
   static cleanupDSL () {
     dsl_methods.forEach(method => delete(global[method]))
+  }
+  
+  static finalize(){
+    ModelDefinition.getAll().forEach(definition => definition.finalizeRelationships())
   }
 
   static load (path) {
@@ -127,22 +157,37 @@ export default class ModelDefinition {
   constructor (name = "Document") {
     this.name = inflections.camelize(name)
     this.type_alias = inflections.underscore(name.toLowerCase())
+    this.groupName = inflections.pluralize(name.toLowerCase())
 
     this.attributes = {}
     this.sections = {}
     this.actions = {}
+    this.relationships = {}
 
     //store a reference in the bucket
     definitions[this.name] = this
     type_aliases[this.type_alias] = this.name
   }
   
-  static getTypeAliases(){
-    return Object.keys(type_aliases)
+  finalizeRelationships(){
+    _(this.relationships).values().forEach(relationship => {
+      relationship.modelDefinition = function(){
+        return ModelDefinition.lookup(relationship.relationship)
+      }
+    })
   }
-  
+
   actionNames(){
     return Object.keys(this.actions)
+  }
+
+  getAllModelInstances(){
+    let results = []
+    let groupName = this.groupName
+
+    return _.flatten(brief.instances().map(briefcase => {
+      results.push(briefcase.filterAll(model => model.groupName == groupName))
+    }))
   }
 
   toCollectionPrototype() {
