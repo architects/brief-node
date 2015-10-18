@@ -15,6 +15,9 @@ const manifest = JSON.parse(fs.readFileSync(pkg))
 let brief = {
   VERSION: manifest.version,
   plugins: plugins,
+  pluginNames: function(){
+    return Object.keys(pluginNames)
+  },
   Briefcase: Briefcase,
   Model: Model,
   ModelDefinition: ModelDefinition,
@@ -25,6 +28,9 @@ let brief = {
   },
   findBriefcaseByPath: function(path){
     return Briefcase.findForPath(path)
+  },
+  atPath: function(root, options={}){
+    return Briefcase.load(root, options)
   },
   load: function (root, options={}) {
     return Briefcase.load(root, options)

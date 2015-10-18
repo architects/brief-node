@@ -15,11 +15,6 @@ describe "Filtering", ->
 describe "The Briefcase", ->
   epic = briefcase.at "epics/model-definition-dsl"
 
-  it "has a cache key", ->
-    briefcase.cacheKey.should.not.equal(undefined)
-
-  it "shouldn't be stale", ->
-    briefcase.isStale().should.equal(false)
 
   it "provides access to documents by their relative path", ->
     briefcase.at('epics/model-definition-dsl').should.have.property('document')

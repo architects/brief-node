@@ -46,9 +46,16 @@ export default class Document {
     return Model.fromDocument(this, options)
   }
   
+  writeSync(newContent){
+    newContent = newContent || this.content
+    fs.writeFileSync(this.path, newContent)
+    this.reload()
+  }
+
   lastModifiedAt(){
     return fs.lstatSync(this.path).mtime.valueOf()
   }
+
   /**
    * returns a rendered document
    * @return {Document} - this document

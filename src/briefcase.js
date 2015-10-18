@@ -75,7 +75,7 @@ export default class Briefcase {
   
 
   computeCacheKey(){
-    let modifiedTimes = this.getAllModels().map(model => model.lastModifiedAt()).sort().reverse()
+    let modifiedTimes = this.getAllModels().map(model => model.lastModifiedAt()).sort()
     let latest = modifiedTimes[modifiedTimes.length - 1]
     return [this.name, modifiedTimes.length, latest].join(':')
   }
