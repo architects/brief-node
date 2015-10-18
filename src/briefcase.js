@@ -73,6 +73,17 @@ export default class Briefcase {
     __cache[this.root] = this
   }
   
+
+  computeCacheKey(){
+    let modifiedTimes = this.getAllModels().map(model => model.lastModifiedAt()).sort().reverse()
+    let latest = modifiedTimes[modifiedTimes.length - 1]
+    return [this.name, modifiedTimes.length, latest].join(':')
+  }
+  
+  isStale(){
+    return (this.cacheKey != this.computeCacheKey())
+  }
+
   setup(){
     require('./index').plugins.forEach(modifier => {
       modifier(this)
@@ -81,6 +92,8 @@ export default class Briefcase {
     this._loadModelDefinitions()
     this._buildIndexFromDisk()
     this._createCollections()
+
+    this.cacheKey = this.computeCacheKey()
   }
   
   /**

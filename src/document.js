@@ -46,6 +46,9 @@ export default class Document {
     return Model.fromDocument(this, options)
   }
   
+  lastModifiedAt(){
+    return fs.lstatSync(this.path).mtime.valueOf()
+  }
   /**
    * returns a rendered document
    * @return {Document} - this document

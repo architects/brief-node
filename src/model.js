@@ -32,6 +32,10 @@ export default class Model {
     return typeof(value) === 'function' ? value.call(this) : value
   }
 
+  lastModifiedAt(){
+    return this.document.lastModifiedAt()
+  }
+
   toString(){
     return 'Document: ' + this.document.path
   }
@@ -68,8 +72,6 @@ export default class Model {
     if(!relatedModel){
       throw('Invalid relationship ' + relationshipId)
     }
-    
-    console.log(config)
 
     let collection = this.getModelsCollection(relatedModel.groupName) 
     
