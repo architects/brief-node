@@ -104,7 +104,7 @@ export default class ModelDefinition {
     return definitions
   }
 
-  static lookup (aliasOrName, singular = false) {
+  static lookup (aliasOrName, singular = true) {
     if(definitions[aliasOrName]){
       return definitions[aliasOrName]
     }
@@ -116,8 +116,12 @@ export default class ModelDefinition {
     }
 
     if(singular == true){
-      return lookup(inflections.singularize(aliasOrName, true))
+      return ModelDefinition.lookup(inflections.singularize(aliasOrName), false)
     }
+  }
+  
+  static getTypeAliases(){
+    return Object.keys(type_aliases)
   }
 
   constructor (name = "Document") {

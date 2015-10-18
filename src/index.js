@@ -14,6 +14,12 @@ let brief = {
   ModelDefinition: ModelDefinition,
   registry: registry,
   model: model,
+  instances: function(){
+    return Briefcase.instances()
+  },
+  findBriefcaseByPath: function(path){
+    return Briefcase.findForPath(path)
+  },
   load: function (root, options={}) {
     return Briefcase.load(root, options)
   },

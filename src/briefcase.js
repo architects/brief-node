@@ -12,6 +12,8 @@ import _ from 'underscore'
 const inflect = inflections(true)
 const pluralize = inflect.pluralize
 
+const __cache = {}
+
 export default class Briefcase {
   /**
   * Load a briefcase by passing a path to a root folder.
@@ -25,8 +27,20 @@ export default class Briefcase {
   }
  
   /**
+  * Find the Briefcase instance responsible for a particular path.
+  * Models and Documents will use this to find the Briefcase they
+  * belong to 
+  *
+  * @param {path} path - the path of the document which wants to know
   */
-
+  static findForPath(checkPath=""){
+    let matchingPath = Object.keys(__cache).find(p => checkPath.match(p))
+    return __cache[matchingPath]
+  }
+  
+  static instances(){
+    return Object.keys(__cache).map(path => __cache[path])
+  }
   /**
   * Create a new Briefcase object at the specified root path.
   *
@@ -56,6 +70,7 @@ export default class Briefcase {
     }
     
     this.setup()
+    __cache[this.root] = this
   }
   
   setup(){
@@ -260,7 +275,6 @@ export default class Briefcase {
       let id = path_alias.replace('.md','')
       let document = new Document(path, {id: id})
       let model = document.toModel({id: id}) 
-      
       
       document.id = path_alias
       document.relative_path = 'docs/' + path_alias
