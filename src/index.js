@@ -16,9 +16,6 @@ const manifest = JSON.parse(fs.readFileSync(pkg))
 let brief = {
   VERSION: manifest.version,
   plugins: plugins,
-  pluginNames: function(){
-    return Object.keys(pluginNames)
-  },
   Briefcase: Briefcase,
   Model: Model,
   ModelDefinition: ModelDefinition,
@@ -44,6 +41,32 @@ let brief = {
       brief,
       root
     }).run()
+  },
+  fromPath: function(pathname, options){
+    if(fs.existsSync(pathname + './package.json')){
+      return brief.fromManifest(pathname + './package.json', options)
+    }
+    return brief.load(pathname, options)
+  },
+  fromManifest: function(briefcaseManifestPath, options){
+    let usesPlugins = []
+    let parsed = {}
+    
+    if(fs.existsSync(briefcaseManifestPath)){
+      parsed = JSON.parse(fs.readFileSync(briefcaseManifestPath).toString())
+      if(parsed.brief && parsed.brief.plugins){
+        usesPlugins = usesPlugins.concat(parsed.brief.plugins)  
+      }
+    }
+
+    usesPlugins.forEach(pluginName => {
+      brief.use(require('brief-plugins-' + pluginName))
+    })
+
+    return brief.load(path.dirname(briefcaseManifestPath), options)
+  },
+  pluginNames: function(){
+    return Object.keys(pluginNames)
   },
   use: function(plugin, options){
     var modifier = plugin(this, options)
