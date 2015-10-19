@@ -40,7 +40,10 @@ let brief = {
     return require("../test/example")()
   },
   generate: function(root, options={}){
-
+    return new Generator({
+      brief,
+      root
+    }).run()
   },
   use: function(plugin, options){
     var modifier = plugin(this, options)
