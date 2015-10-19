@@ -1,6 +1,6 @@
 {
   "name": "brief-node",
-  "version": "2.7.5",
+  "version": "2.7.6",
   "description": "Brief.  The Active Writing Framework.",
   "main": "index.js",
   "scripts": {

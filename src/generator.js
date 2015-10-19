@@ -12,11 +12,14 @@ export default class Generator {
   }
   
   run(){
+    let root = this.root || process.env.PWD
     this.documentFolderNames().forEach(baseName => {
-      let modelFolderPath = path.join(this.root, 'docs', baseName)
+      let modelFolderPath = path.join(root, 'docs', baseName)
       console.log("Creating " + baseName + " Folder", modelFolderPath)
       try {
-        fs.mkdirpSync(modelFolderPath)
+        if(!fs.existsSync(modelFolderPath)){
+          fs.mkdirSync(modelFolderPath)
+        }
       } catch (e) {
         console.log("Error: " + e.message)
       }
