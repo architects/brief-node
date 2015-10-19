@@ -23,3 +23,14 @@ export function flatten (array) {
 export function singularize (string) {
   return inflections.singularize(string)
 }
+
+export function createDelegators(target, source, options={}){
+  let excludeKeys = options.exclude || options.except || [] 
+  let sourceKeys = Object.keys(source).filter(key => excludeKeys.indexOf(key) === -1)
+  
+  sourceKeys.forEach(key => Object.defineProperty(target, key, {
+    get: function(){
+      return source[key]
+    }
+  }))
+}

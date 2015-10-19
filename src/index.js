@@ -5,6 +5,7 @@ import Model from "./model"
 import Document from "./document"
 import ModelDefinition from "./model_definition"
 import {model, registry} from './model_registry'
+import Generator from './generator'
 
 const plugins = []
 const pluginNames = {}
@@ -37,6 +38,9 @@ let brief = {
   },
   example: function(options={}){
     return require("../test/example")()
+  },
+  generate: function(root, options={}){
+
   },
   use: function(plugin, options){
     var modifier = plugin(this, options)

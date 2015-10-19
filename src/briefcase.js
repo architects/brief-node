@@ -88,7 +88,7 @@ export default class Briefcase {
     require('./index').plugins.forEach(modifier => {
       modifier(this)
     })
-
+    
     this._loadModelDefinitions()
     this._buildIndexFromDisk()
     this._createCollections()
@@ -273,14 +273,9 @@ export default class Briefcase {
     let docs_path = path.resolve(this.config.docs_path)
     return glob.sync(path.join(docs_path,'**/*.md'))
   }
-  
-  _getModelDefinitionFiles () {
-    let models_path = path.resolve(this.config.models_path)
-    return glob.sync(path.join(models_path,'**/*.js'))
-  }
-  
+
   _loadModelDefinitions(){
-    this._getModelDefinitionFiles().forEach(file => ModelDefinition.load(file))
+    ModelDefinition.loadDefinitionsFromPath(this.config.models_path)
     ModelDefinition.getAll().forEach(definition => this.loadModel(definition))
     ModelDefinition.finalize()
   }

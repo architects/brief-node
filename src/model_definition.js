@@ -1,4 +1,6 @@
 import inflect from 'i'
+import path from 'path'
+import glob from 'glob-all'
 import fs from 'fs'
 import _ from 'underscore'
 import brief from './index'
@@ -97,6 +99,16 @@ class AttributeConfig {
 }
 
 export default class ModelDefinition {
+  static findDefinitionFilesInPath(pathname){
+    let models_path = path.resolve(pathname)
+    return glob.sync(path.join(models_path,'**/*.js'))
+  }
+
+  static loadDefinitionsFromPath(pathname){
+    let files = ModelDefinition.findDefinitionFilesInPath(pathname)
+    files.forEach(file => ModelDefinition.load(file))
+  }
+
   static setupDSL () {
     dsl_methods.forEach(method => global[method] = dsl[method])    
   }
