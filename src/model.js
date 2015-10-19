@@ -16,17 +16,21 @@ export default class Model {
 
   constructor(document, options={}) {
     this.document     = document
-    this.data         = document.data || {}
     this.groupName    = options.groupName || "documents"
     this.id           = options.id
     this.document.id  = this.id
     
-    this.type = this.data.type || document.getType()
-    this.groupName = string.pluralize(this.type)
+    this.type = document.getType()
+
+    this._createDataGetters()
     
-    Object.keys(this.data).forEach(key => this[key] = this.data[key])
+    this.groupName = string.pluralize(this.type)
   }
   
+  get data(){
+    return this.document.data
+  }
+
   read(property){
     let value = this[property]
     return typeof(value) === 'function' ? value.call(this) : value
@@ -44,6 +48,20 @@ export default class Model {
     return {
       data: this.data
     }
+  }
+  
+  _createDataGetters(){
+    let model = this
+
+    Object.keys(this.document.data || {}).forEach(key => {
+      if(key === 'type') { return }
+
+      Object.defineProperty(model, key, {
+        get: function(){
+          return model.data[key]
+        }
+      })
+    })
   }
 
   extractContent() {

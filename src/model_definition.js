@@ -211,11 +211,20 @@ export default class ModelDefinition {
   toPrototype () {
     let obj = function(){ }
     let definition = this
+    let attributeNames = Object.keys(this.attributes)
 
     obj.prototype = Model
     
     obj.getModelDefinition = function(){
       return definition
+    }
+
+    for(var name in attributeNames){
+      Object.defineProperty(obj, name, {
+        get: function(){
+          return this.data[name]
+        }
+      })
     }
 
     for(var action in this.actions){
