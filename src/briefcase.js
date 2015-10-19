@@ -180,7 +180,7 @@ export default class Briefcase {
    * returns all the models in this briefcase
   */
   getAllModels() {
-    return Object.values(this.index)
+    return Object.keys(this.index).map(key => this.index[key])
   }
   
   /**
