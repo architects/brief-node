@@ -91,12 +91,12 @@ export default class Model {
       throw('Invalid relationship ' + relationshipId)
     }
 
-    let collection = this.getModelsCollection(relatedModel.groupName) 
+    let collection = this.getModelsCollection(relatedModel.groupName) || _([])
     
     if(config.hasMany){
       let myKeyValue = this.read(config.key)
       let foreignKeyField = config.foreignKey
-
+      
       return collection.filter(model => {
         return model.read(foreignKeyField) === myKeyValue        
       })
