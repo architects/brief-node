@@ -10,6 +10,10 @@ import {clone,slugify} from './util'
 
 const processor = mdast.use([yaml,squeeze,normalize,html])
 
+export function markdown(){
+  return processor
+}
+
 export function parse(document) {
   let parsed = processor.parse(document.content),
       nodes  = parsed.children

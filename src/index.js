@@ -6,6 +6,7 @@ import Document from "./document"
 import ModelDefinition from "./model_definition"
 import {model, registry} from './model_registry'
 import Generator from './generator'
+import {markdown} from './render'
 
 const plugins = []
 const pluginNames = {}
@@ -68,6 +69,7 @@ let brief = {
   pluginNames: function(){
     return Object.keys(pluginNames)
   },
+  markdown: markdown,
   use: function(plugin, options){
     var modifier = plugin(this, options)
     modifier.version = plugin.version
