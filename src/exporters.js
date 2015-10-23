@@ -35,7 +35,7 @@ function standard(briefcase, options={}){
     pluginNames: briefcase.pluginNames,
     index: index,
     config: briefcase.config,
-    root: briefcase.root
+    manifest: briefcase.manifest || {}
   }
 }
 
