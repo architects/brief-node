@@ -10,3 +10,6 @@ describe 'Loading a plugin', ->
   it "should load the sample plugin directly on a briefcase", ->
     briefcase.use(sample)
     briefcase.samplePluginLoaded.should.eql(2)
+
+  it "should record the name", ->
+    briefcase.pluginNames.should.containEql('blueprint')

@@ -43,10 +43,40 @@ export default class Model {
   toString(){
     return 'Document: ' + this.document.path
   }
+  
+  forExport(options = {}){
+    let forExport = {
+      id: this.id,
+      data: this.data,
+      lastModified: this.lastModifiedAt()
+    }
+
+    let briefcase = this.getBriefcase()
+
+    if(briefcase){
+      forExport.briefcase = {
+        root: briefcase.root,
+        title: briefcase.title
+      }
+    }
+
+    if(options.includeDocument){
+      forExport.document = {
+        path: this.document.path.replace(briefcase.config.docs_path + '/', ''),
+        content: this.document.content,
+        data: this.document.data,
+        type: this.document.getType()
+      }
+    }
+
+    return forExport
+  }
 
   toJSON(options={}) {
     return {
-      data: this.data
+      id: this.id,
+      data: this.data,
+      lastModifiedAt: this.lastModifiedAt(),
     }
   }
   
@@ -81,6 +111,18 @@ export default class Model {
     if(bc){
       return bc[groupName]
     }
+  }
+
+  relationIds(){
+    let relationships = this.getRelationshipsConfig()
+
+    return relationships.reduce(function(memo,relationshipId){
+      memo[relationshipId] = []
+      let relatedIds = this.related(relationshipId).map(relation => relation.id)
+
+      memo[relationshipId].concat(relatedIds)
+      return memo 
+    }, {})
   }
 
   related(relationshipId){

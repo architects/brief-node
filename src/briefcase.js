@@ -1,3 +1,4 @@
+import fs from 'fs'
 import glob from 'glob-all'
 import path from 'path'
 import Document from './document'
@@ -6,6 +7,7 @@ import Model from './model'
 import ModelDefinition from './model_definition'
 import inflections from 'i'
 import Packager from './packager'
+import exporters from './exporters'
 import _ from 'underscore'
 
 
@@ -73,6 +75,16 @@ export default class Briefcase {
     __cache[this.root] = this
   }
   
+  // Returns the manifest data from the package.json manifest
+  get manifest(){
+    if(fs.existsSync(path.join(this.root, 'package.json'))){
+      return JSON.parse(fs.readFileSync(path.join(this.root, 'package.json')))
+    }
+  }
+  
+  exportWith(exporterFormat="standard", options = {}){
+    return exporters.cached(this, exporterFormat, options)
+  }
 
   computeCacheKey(){
     let modifiedTimes = this.getAllModels().map(model => model.lastModifiedAt()).sort()
@@ -83,9 +95,11 @@ export default class Briefcase {
   isStale(){
     return (this.cacheKey != this.computeCacheKey())
   }
-
+  
   setup(){
+    this.pluginNames = []
     require('./index').plugins.forEach(modifier => {
+      this.pluginNames.push(modifier.plugin_name || modifier.pluginName)
       modifier(this)
     })
     
