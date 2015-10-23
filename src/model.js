@@ -44,6 +44,48 @@ export default class Model {
     return 'Document: ' + this.document.path
   }
   
+  /**
+  * scores a given search term against this model.
+  * this method can be overridden to provide custom logic
+  * for a given model
+  */
+  scoreSearchTerm(term="", options={}){
+    let score = 0
+
+    if(this.title && this.title === term){
+      return 100
+    }
+
+    if(this.title && this.title.match(term)){
+      return 90
+    }
+    
+    let sectionHeadings = this.document.getSectionHeadings()
+    let articleHeadings = this.document.getArticleHeadings()
+    
+    score = score + sectionHeadings.reduce((memo,heading)=>{
+      if(heading === term){
+        return memo + 50
+      }
+      if(heading.match(term)){
+        return memo + 30
+      }
+      return memo
+    }, 0)
+
+    score = score + articleHeadings.reduce((memo,heading)=>{
+      if(heading === term){
+        return memo + 40
+      }
+      if(heading.match(term)){
+        return memo + 20
+      }
+      return memo
+    }, 0)
+    
+    return score
+  }
+ 
   forExport(options = {}){
     let forExport = {
       id: this.id,
