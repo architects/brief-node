@@ -18,32 +18,6 @@ const __cache = {}
 
 export default class Briefcase {
   /**
-  * Load a briefcase by passing a path to a root folder.
-  *
-  * @param {string} rootPath - the root path of the briefcase.
-  * @return {Briefcase} - returns a briefcase
-  *
-  */
-  static load(rootPath, options={}) {
-    return new Briefcase(rootPath,options)
-  }
- 
-  /**
-  * Find the Briefcase instance responsible for a particular path.
-  * Models and Documents will use this to find the Briefcase they
-  * belong to 
-  *
-  * @param {path} path - the path of the document which wants to know
-  */
-  static findForPath(checkPath=""){
-    let matchingPath = Object.keys(__cache).find(p => checkPath.match(p))
-    return __cache[matchingPath]
-  }
-  
-  static instances(){
-    return Object.keys(__cache).map(path => __cache[path])
-  }
-  /**
   * Create a new Briefcase object at the specified root path.
   *
   * @param {path} root - the root path of the briefcase. expects
@@ -74,7 +48,42 @@ export default class Briefcase {
     this.setup()
     __cache[this.root] = this
   }
+ 
+  /**
+  * Load a briefcase by passing a path to a root folder.
+  *
+  * @param {string} rootPath - the root path of the briefcase.
+  * @return {Briefcase} - returns a briefcase
+  *
+  */
+  static load(rootPath, options={}) {
+    return new Briefcase(rootPath,options)
+  }
+ 
+  /**
+  * Find the Briefcase instance responsible for a particular path.
+  * Models and Documents will use this to find the Briefcase they
+  * belong to 
+  *
+  * @param {path} path - the path of the document which wants to know
+  */
+  static findForPath(checkPath=""){
+    let matchingPath = Object.keys(__cache).find(p => checkPath.match(p))
+    return __cache[matchingPath]
+  }
   
+  /**
+  * Return all instances of a Briefcase that we are aware of from the cache
+  */
+  static instances(){
+    return Object.keys(__cache).map(path => __cache[path])
+  }
+  
+  /**
+  * Gets any config values that have been supplied via the `package.json`
+  * in this Briefcase root.  Looks for a key called `brief`, as well as any
+  * of the plugins that have been loaded.
+  */
   get manifestConfig(){
     let base = {}
     let manifest = this.manifest 
@@ -91,16 +100,22 @@ export default class Briefcase {
       return memo
     }, base)
   }
-
-  // Returns the manifest data from the package.json manifest
+  
+  /**
+  * Gets a serialized version of the `package.json` that exists in this Briefcase root folder.
+  */
   get manifest(){
     if(fs.existsSync(path.join(this.root, 'package.json'))){
       return JSON.parse(fs.readFileSync(path.join(this.root, 'package.json')))
     }
   }
   
+  /**
+  * Turn all of the documents, models, data, assets, and other metadata about this briefcase
+  * into a single JSON structure. Alias for the `exportWith` method.
+  */
   toJSON(options={}){
-    return this.exportWith("standard", options)
+    return this.exportWith(options.format || "standard", options)
   }
 
   exportWith(exporterFormat="standard", options = {}){
