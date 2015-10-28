@@ -160,7 +160,7 @@ export default class Model {
   }
 
   relationIds(){
-    let relationships = this.getRelationshipsConfig()
+    let relationships = this.config.relationships
 
     return relationships.reduce(function(memo,relationshipId){
       memo[relationshipId] = []
@@ -205,34 +205,33 @@ export default class Model {
       return this.expectedSectionHeadings().indexOf(node.heading) >= 0
     })
   }
+  
+  get config(){
+    return {
+      attributes: this.modelDefinition.attributes,
+      relationships: this.modelDefinition.relationships,
+      sections: this.modelDefinition.sections
+    }
+  }
 
   getAttributeConfig(key) {
-    return getAttributesConfig()[key]
+    return this.config.attributes[key]
   }
-
-  getAttributesConfig() {
-    return this.getModelDefinition().attributes
-  }
-
-  getSectionsConfig(){
-    return this.getModelDefinition().sections
-  }
-  
-  getRelationshipsConfig(){
-    return this.getModelDefinition().relationships
-  }
-
+ 
   getRelationshipConfig(relationshipId){
-    return this.getRelationshipsConfig()[relationshipId]
+    return this.config.relationships[relationshipId]
   }
 
   expectedSectionHeadings(){
-    const cfg = this.getSectionsConfig()
-    return flatten(Object.values(cfg).map(def => [def.name, def.aliases]))
+    return flatten(Object.values(this.config.sections).map(def => [def.name, def.aliases]))
   }
-
+  
   getModelDefinition(){
+    console.log('Deprecated getModelDefinition')
+    return this.modelDefinition
+  }
+  
+  get modelDefinition(){
     return ModelDefinition.lookup(this.type)
   }
-
 }
