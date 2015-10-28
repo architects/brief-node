@@ -11,5 +11,8 @@ describe 'Loading a plugin', ->
     briefcase.use(sample)
     briefcase.samplePluginLoaded.should.eql(2)
 
+  it "should pick up any config for this plugin from the manifest", ->
+    briefcase.manifestConfig.should.have.property 'blueprint'
+
   it "should record the name", ->
     briefcase.pluginNames.should.containEql('blueprint')

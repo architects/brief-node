@@ -1,0 +1,19 @@
+{
+  "name": "brief-node-example-briefcase",
+  "version": "1.0.0",
+  "description": "the active writing framework",
+  "main": "index.js",
+  "author": "Jonathan Soeder",
+  "dependencies": {
+    "brief-node": "latest",
+    "brief-plugins-blueprint": "latest"
+  },
+  "blueprint":{
+    "config": "property"
+  },
+  "brief":{
+    "client": "architects.io",
+    "docs_path": "$root/docs",
+    "models_path": "$root/models"
+  }
+}

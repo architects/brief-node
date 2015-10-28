@@ -75,6 +75,23 @@ export default class Briefcase {
     __cache[this.root] = this
   }
   
+  get manifestConfig(){
+    let base = {}
+    let manifest = this.manifest 
+
+    if (_.isEmpty(manifest)) { return {} }
+
+    if(manifest.brief){ base.brief = manifest.brief }
+
+    return this.pluginNames.reduce((memo,plugin)=>{
+      if(manifest[plugin]){
+        memo[plugin] = manifest[plugin]
+      }
+
+      return memo
+    }, base)
+  }
+
   // Returns the manifest data from the package.json manifest
   get manifest(){
     if(fs.existsSync(path.join(this.root, 'package.json'))){
