@@ -16,11 +16,10 @@ describe "An Example Model Instance", ->
     json.data.title.should.equal('Model Definition DSL')
 
   it "tells me the expected section headings", ->
-    headings = epic.expectedSectionHeadings()
-    headings.should.containEql('Features','User Stories','Stories')
+    epic.expectedSectionHeadings.should.containEql('Features','User Stories','Stories')
 
   it "returns the nodes which have been defined as sections", ->
-    epic.definedSectionNodes().length.should.eql(1)
+    epic.definedSectionNodes.length.should.eql(1)
 
   it "lets me read a value even if it is a function", ->
     epic.read('title').should.equal('Model Definition DSL')

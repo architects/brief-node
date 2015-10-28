@@ -200,12 +200,20 @@ export default class Model {
     }
   }
 
-  definedSectionNodes(){
+  get definedSectionNodes(){
     return this.document.getSectionNodes().filter(node => {
-      return this.expectedSectionHeadings().indexOf(node.heading) >= 0
+      return this.expectedSectionHeadings.indexOf(node.heading) >= 0
     })
   }
-  
+
+  getAttributeConfig(key) {
+    return this.config.attributes[key]
+  }
+ 
+  getRelationshipConfig(relationshipId) {
+    return this.config.relationships[relationshipId]
+  }
+ 
   get config(){
     return {
       attributes: this.modelDefinition.attributes,
@@ -214,15 +222,7 @@ export default class Model {
     }
   }
 
-  getAttributeConfig(key) {
-    return this.config.attributes[key]
-  }
- 
-  getRelationshipConfig(relationshipId){
-    return this.config.relationships[relationshipId]
-  }
-
-  expectedSectionHeadings(){
+  get expectedSectionHeadings(){
     return flatten(Object.values(this.config.sections).map(def => [def.name, def.aliases]))
   }
   
