@@ -109,6 +109,10 @@ export default class Model {
         data: this.document.data,
         type: this.document.getType()
       }
+
+      if(options.renderDocument){
+        forExport.document.rendered = this.document.render()
+      }
     }
 
     return forExport

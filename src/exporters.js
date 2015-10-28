@@ -24,18 +24,19 @@ function standard(briefcase, options={}){
     let model = briefcase.index[key]
 
     index[key] = model.forExport({
-      includeDocument: true
+      includeDocument: options.includeDocument !== false,
+      renderDocument: options.renderDocument !== false
     })
   })
 
   return {
+    index: index,
+    config: briefcase.config,
+    manifest: briefcase.manifest || {},
     cacheKey: briefcase.cacheKey,
     groupNames: briefcase.getGroupNames(),
     documentTypes: briefcase.getDocumentTypes(),
-    pluginNames: briefcase.pluginNames,
-    index: index,
-    config: briefcase.config,
-    manifest: briefcase.manifest || {}
+    pluginNames: briefcase.pluginNames
   }
 }
 

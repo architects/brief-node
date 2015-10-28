@@ -99,6 +99,10 @@ export default class Briefcase {
     }
   }
   
+  toJSON(options={}){
+    return this.exportWith("standard", options)
+  }
+
   exportWith(exporterFormat="standard", options = {}){
     return exporters.cached(this, exporterFormat, options)
   }
