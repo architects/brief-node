@@ -129,6 +129,51 @@ The Model System allows you to generate reports, visualizations, or
 develop integrations between the different instances of models and
 various APIs that you can work with from within Javascript.
 
+### Assets
+
+A Briefcase project can include `svg, png, jpg, gif, html, css, js`
+files in an assets folder.  These assets will be bundled with the
+project when it gets exported as a single JSON structure.
+
+### Data Sources
+
+A Briefcase project can include `json, yaml, csv` file types in the data
+folder.  These will get treated as data sources and bundled with the
+project when it gets exported as a single JSON structure.
+
+### Special Markdown Syntax Elements
+
+Link tags, and Fenced code blocks can implement special syntax that
+gives you fine grained control over how assets and data sources for
+example, can be incorporated to embed visualizations in the rendered
+markdown output.
+
+An example of how you might link to other documents:
+
+```markdown
+
+# My Heading
+
+Here is a link:
+
+[link:title](projects/brief)
+```
+
+This link tag will create a link to the `projects/brief` document, using
+its title as the text for the link.
+
+What value is used for the href of this link can be configured by
+supplying your own link resolver function.
+
+```es6
+let brief = require('brief-node')
+let briefcase = brief.example()
+
+briefcase.resolver.forLinks(function(id){
+  return "http://architects.io" + id
+})
+```
+
 ### Acknowledgements
 
 - Titus Woormer (@wooorm) for his work on MDast
