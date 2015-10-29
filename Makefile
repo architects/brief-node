@@ -1,4 +1,4 @@
-run_specs: compile
+specs: compile
 	@./node_modules/mocha/bin/mocha \
 		--require should \
 		--require 'babel/register' \

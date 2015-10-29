@@ -1,6 +1,8 @@
 import path from 'path'
 import fs from 'fs'
 import Briefcase from "./briefcase"
+import Asset from './asset'
+import DataSource from './data_source'
 import Model from "./model"
 import Document from "./document"
 import ModelDefinition from "./model_definition"
@@ -19,9 +21,14 @@ let brief = {
   plugins: plugins,
   Briefcase: Briefcase,
   Model: Model,
+   
   ModelDefinition: ModelDefinition,
+
+  // TODO
+  // Think of a better API for this.
   registry: registry,
   model: model,
+
   resolveLink: function(pathAlias){
     if(!brief.linkResolver){
       console.log("There is no link resolver")
@@ -80,8 +87,14 @@ let brief = {
     return Object.keys(pluginNames)
   },
   markdown: markdown,
+  util: require('./util'),
+  mixin: function(mixin, options={}){
+    //TODO 
+    // Allow a plugin to extend default class behavior via mixins
+  },
   use: function(plugin, options){
-    var modifier = plugin(this, options)
+    var brief = this
+    var modifier = plugin(brief, options)
     modifier.version = plugin.version
     modifier.plugin_name = plugin.plugin_name
     
@@ -91,7 +104,7 @@ let brief = {
 
     pluginNames[plugin.plugin_name] = true
 
-    return this
+    return brief
   }
 }
 

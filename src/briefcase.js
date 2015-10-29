@@ -5,6 +5,8 @@ import inflections from 'i'
 import _ from 'underscore'
 
 import brief from '..'
+import Asset from './asset'
+import DataSource from './data_source'
 import Document from './document'
 import Model from './model'
 import ModelDefinition from './model_definition'
@@ -49,7 +51,8 @@ export default class Briefcase {
     this.config = {
       docs_path: path.join(this.root, 'docs'),
       models_path: path.join(this.root, 'models'),
-      assets_path: path.join(this.root, 'assets')
+      assets_path: path.join(this.root, 'assets'),
+      data_path: path.join(this.root, 'data')
     }
     
     this.setup()
@@ -136,11 +139,23 @@ export default class Briefcase {
     return this.resolver.resolveAssetPath(pathAlias)
   }
 
+  get assets(){
+    return this.collections.assets
+  }
+
+  get data(){
+    return this.collections.data
+  }
+
   /**
   * Turn all of the documents, models, data, assets, and other metadata about this briefcase
   * into a single JSON structure. Alias for the `exportWith` method.
   */
   toJSON(options={}){
+    if(_.isString(options)){
+      options = {format: options}
+    }
+
     return this.exportWith(options.format || "standard", options)
   }
 
@@ -163,6 +178,10 @@ export default class Briefcase {
     return this.cacheKey !== this.computeCacheKey()
   }
   
+  /**
+  * setup this briefcase involves loading the model definitions
+  * and creating repositories for any assets or data sources
+  */ 
   setup(){
     this.pluginNames = []
 
@@ -172,6 +191,8 @@ export default class Briefcase {
     })
     
     loadModelDefinitions(this)
+    createAssetRepository(this) 
+    createDataRepository(this) 
   }
   
   /**
@@ -385,3 +406,22 @@ function createCollection(briefcase, modelDefinition){
   }
 }
 
+function createAssetRepository(briefcase){
+  Object.defineProperty(briefcase.collections, 'assets', {
+    configurable: true,
+    get: function(){
+      delete(briefcase.collections.assets)
+      return briefcase.collections.assets = Asset.repo(briefcase, briefcase.config.assets || {})
+    }
+  }) 
+}
+
+function createDataRepository(briefcase){
+  Object.defineProperty(briefcase.collections, 'data', {
+    configurable: true,
+    get: function(){
+      delete(briefcase.collections.data)
+      return briefcase.collections.data = DataSource.repo(briefcase, briefcase.config.data || {})
+    }
+  }) 
+}

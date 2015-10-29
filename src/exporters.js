@@ -3,9 +3,9 @@ import path from 'path'
 import os from 'os'
 
 function cached(briefcase, format, options={}){
-  let cachedPath = path.join(os.tmpdir(), briefcase.cacheKey)
+  let cachedPath = path.join(os.tmpdir(), briefcase.cacheKey + '.' + format + '.json')
 
-  if(fs.existsSync(cachedPath)){
+  if(!options.fresh && fs.existsSync(cachedPath)){
     return JSON.parse(fs.readFileSync(cachedPath))
   }
 
@@ -40,8 +40,21 @@ function standard(briefcase, options={}){
   }
 }
 
+function expanded(briefcase, options){
+  let base = standard(briefcase, options)
+  
+  base.assets = {}
+  base.data = {}
+  
+  briefcase.assets.each(asset => base.assets[asset.id] = asset.content)
+  briefcase.data.each(data_source => base.data[data_source.id] = data_source.data)
+
+  return base
+}
+
 let formatters = {
-  standard
+  standard,
+  expanded
 }
 
 export default {

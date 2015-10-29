@@ -112,7 +112,7 @@ export default class Document {
     delete(this.data)
     delete(this.content)
 
-    process(this)
+    process(this, this.briefcase)
   }
   
   getSectionHeadings(){

@@ -23,7 +23,7 @@ export default class Resolver {
 
   resolveLink(pathAlias){
     if(!this.linkResolver){
-      throw('Must supply a link resolver function. briefcase.resolver.forLinks(myFunction)')
+      return pathAlias
     }
 
     return this.linkResolver(pathAlias)

@@ -13,3 +13,8 @@ describe "Exporting and Bundling", ->
     exportedModel = exported().index['projects/brief.md']
     exportedModel.document.should.have.property('rendered')
     exportedModel.document.should.have.property('content')
+
+  it "should include the data and assets in the expanded version", ->
+    expanded = briefcase.toJSON(format: 'expanded', fresh: true)
+    expanded.data.object.name.should.equal('Jon Soeder')
+    expanded.assets['folder/system-architecture'].should.match(/svg/)
