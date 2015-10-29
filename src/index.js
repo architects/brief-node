@@ -9,6 +9,7 @@ import ModelDefinition from "./model_definition"
 import {model, registry} from './model_registry'
 import Generator from './generator'
 import {markdown} from './render'
+import {mixin} from './util'
 
 const plugins = []
 const pluginNames = {}
@@ -88,9 +89,18 @@ let brief = {
   },
   markdown: markdown,
   util: require('./util'),
-  mixin: function(mixin, options={}){
-    //TODO 
-    // Allow a plugin to extend default class behavior via mixins
+  mixin: function(extension, options={}){
+    if(typeof(options)==='string'){
+      options = {target: options}
+    }
+
+    let {target} = options
+    
+    if(target === 'model'){ mixin(Model, extension) }
+    if(target === 'briefcase'){ mixin(Briefcase, extension) }
+    if(target === 'document'){ mixin(Document, extension) }
+    if(target === 'asset'){ mixin(Asset, extension) }
+    if(target === 'data'){ mixin(DataSource, extension) }
   },
   use: function(plugin, options){
     var brief = this
