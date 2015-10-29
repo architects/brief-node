@@ -22,6 +22,16 @@ let brief = {
   ModelDefinition: ModelDefinition,
   registry: registry,
   model: model,
+  resolveLink: function(pathAlias){
+    if(!brief.linkResolver){
+      console.log("There is no link resolver")
+      return pathAlias
+    }
+    return brief.linkResolver(pathAlias)
+  },
+  resolveLinksWith: function(fn){
+    brief.linkResolver = fn
+  },
   instances: function(){
     return Briefcase.instances()
   },

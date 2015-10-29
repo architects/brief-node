@@ -1,4 +1,3 @@
-brief = require("..")
 sample = require("./sample-plugin")
 
 describe 'Loading a plugin', ->

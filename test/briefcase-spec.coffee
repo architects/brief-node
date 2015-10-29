@@ -15,7 +15,6 @@ describe "Filtering", ->
 describe "The Briefcase", ->
   epic = briefcase.at "epics/model-definition-dsl"
 
-
   it "provides access to documents by their relative path", ->
     briefcase.at('epics/model-definition-dsl').should.have.property('document')
 

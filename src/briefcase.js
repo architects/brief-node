@@ -1,20 +1,25 @@
 import fs from 'fs'
 import glob from 'glob-all'
 import path from 'path'
-import Document from './document'
-import collection from './collection'
-import Model from './model'
-import ModelDefinition from './model_definition'
 import inflections from 'i'
-import Packager from './packager'
-import exporters from './exporters'
 import _ from 'underscore'
 
+import brief from '..'
+import Document from './document'
+import Model from './model'
+import ModelDefinition from './model_definition'
+import Packager from './packager'
+import Resolver from './Resolver'
+
+import collection from './collection'
+import exporters from './exporters'
 
 const inflect = inflections(true)
 const pluralize = inflect.pluralize
 
 const __cache = {}
+const __documentIndexes = {}
+const __cacheKeys = {}
 
 export default class Briefcase {
   /**
@@ -30,14 +35,16 @@ export default class Briefcase {
   * @param {path} assets_path - which folder contains the assets to use if any.
   */
   constructor(root, options) {
+    __cache[this.root] = this
+
     this.root         = path.resolve(root)
     this.name         = options.name || path.basename(root)
     this.parentFolder = path.dirname(root)
 
     this.options = options || {}
-    
-    this.index = {}
+
     this.model_definitions = {}
+    this.collections = {}
     
     this.config = {
       docs_path: path.join(this.root, 'docs'),
@@ -46,9 +53,16 @@ export default class Briefcase {
     }
     
     this.setup()
-    __cache[this.root] = this
   }
- 
+  
+  get index(){
+    if(__documentIndexes[this.root]){
+      return __documentIndexes[this.root]
+    }
+    
+    return __documentIndexes[this.root] = buildIndexFromDisk(this)
+  }
+
   /**
   * Load a briefcase by passing a path to a root folder.
   *
@@ -110,6 +124,18 @@ export default class Briefcase {
     }
   }
   
+  get resolver(){
+    return Resolver.create(this)
+  }
+
+  resolveLink(pathAlias){
+    return this.resolver.resolveLink(pathAlias)
+  }
+
+  resolveAssetPath(pathAlias){
+    return this.resolver.resolveAssetPath(pathAlias)
+  }
+
   /**
   * Turn all of the documents, models, data, assets, and other metadata about this briefcase
   * into a single JSON structure. Alias for the `exportWith` method.
@@ -121,6 +147,11 @@ export default class Briefcase {
   exportWith(exporterFormat="standard", options = {}){
     return exporters.cached(this, exporterFormat, options)
   }
+  
+  get cacheKey(){
+    if(__cacheKeys[this.root]){ return __cacheKeys[this.root] }
+    return __cacheKeys[this.root] = this.computeCacheKey()
+  }
 
   computeCacheKey(){
     let modifiedTimes = this.getAllModels().map(model => model.lastModifiedAt()).sort()
@@ -129,21 +160,18 @@ export default class Briefcase {
   }
   
   isStale(){
-    return (this.cacheKey != this.computeCacheKey())
+    return this.cacheKey !== this.computeCacheKey()
   }
   
   setup(){
     this.pluginNames = []
+
     require('./index').plugins.forEach(modifier => {
       this.pluginNames.push(modifier.plugin_name || modifier.pluginName)
       modifier(this)
     })
     
-    this._loadModelDefinitions()
-    this._buildIndexFromDisk()
-    this._createCollections()
-
-    this.cacheKey = this.computeCacheKey()
+    loadModelDefinitions(this)
   }
   
   /**
@@ -215,14 +243,14 @@ export default class Briefcase {
   /**
    * selects all the models whose type matches the supplied arg 
   */
-  selectModelsByType (type) {
+  selectModelsByType(type) {
     return this.filterAllByProperty('type', type)
   }
 
   /**
    * selects all the models whose groupName matches the supplied arg 
   */
-  selectModelsByGroup (groupName) {
+  selectModelsByGroup(groupName) {
     return this.filterAllByProperty('groupName', groupName)
   }
   
@@ -256,18 +284,11 @@ export default class Briefcase {
   }
   
   getGroupNames () {
-    let types = this.getDocumentTypes()
-    return types.map(type => pluralize(type || ""))
+    return Object.keys(this.model_definitions).map(name => inflect.pluralize(name.toLowerCase()))
   }
 
   getDocumentTypes () {
-    let types = []
-
-    this.getAllDocuments().forEach((doc)=>{
-      types.push(doc.getType())
-    })
-
-    return _(types).uniq()
+    return Object.keys(this.model_definitions).map(name => inflect.underscore(name.toLowerCase()))
   }
   
   loadModelDefinition(path){
@@ -275,7 +296,7 @@ export default class Briefcase {
   }
 
   loadModel (definition) {
-    this.model_definitions[definition.name] = true
+    this.model_definitions[definition.name] = true 
     return definition
   }
 
@@ -304,51 +325,63 @@ export default class Briefcase {
     return useAbsolutePaths ? allFiles : allFiles.map(f => f.replace(this.root + '/', ''))
   }
  
-  _createCollections() {
-    const briefcase = this
-
-    this.getDocumentTypes().forEach(type => {
-      let group       = pluralize(type)
-      let definition  = this.getModelDefinition(type)
-      
-      let fetch = ()=> {
-        return this.selectModelsByType(type)
-      }
-
-      briefcase[group] = briefcase[group] || collection(fetch, definition) 
-    })
-  }
  
   _getDocumentPaths() {
     let docs_path = path.resolve(this.config.docs_path)
     return glob.sync(path.join(docs_path,'**/*.md'))
   }
 
-  _loadModelDefinitions(){
-    ModelDefinition.loadDefinitionsFromPath(this.config.models_path)
-    ModelDefinition.getAll().forEach(definition => this.loadModel(definition))
-    ModelDefinition.finalize()
-  }
-
-  _buildIndexFromDisk() {
-    let paths = this._getDocumentPaths()
-    let briefcase = this
-
-    paths.forEach((path)=>{
-      let path_alias = path.replace(this.config.docs_path + '/', '')
-      let id = path_alias.replace('.md','')
-      let document = new Document(path, {id: id})
-      let model = document.toModel({id: id}) 
-      
-      document.id = path_alias
-      document.relative_path = 'docs/' + path_alias
-      model.id = id
-      model.getParent = ()=>{ 
-        return this
-      }
-
-      this.index[path_alias] = model
-    })
-  }
-
 }
+
+function buildIndexFromDisk(briefcase) {
+  let paths = briefcase._getDocumentPaths()
+  let index = {}
+
+  paths.forEach((path)=>{
+    let path_alias = path.replace(briefcase.config.docs_path + '/', '')
+    let id = path_alias.replace('.md','')
+    let document = new Document(path, {id: id})
+    let model = document.toModel({id: id}) 
+    
+    document.id = path_alias
+    document.relative_path = 'docs/' + path_alias
+    model.id = id
+    model.getParent = ()=>{ return briefcase }
+    index[path_alias] = model
+  })
+
+  return index
+}
+
+function loadModelDefinitions(briefcase){
+  ModelDefinition.loadDefinitionsFromPath(briefcase.config.models_path)
+
+  ModelDefinition.getAll().forEach(function(definition){
+    briefcase.loadModel(definition)
+    createCollection(briefcase, definition)
+  })
+
+  ModelDefinition.finalize()
+}
+
+function createCollection(briefcase, modelDefinition){
+  let {groupName, type_alias} = modelDefinition
+  
+  try {
+    Object.defineProperty(briefcase, groupName, {
+      get: function(){
+        if(briefcase.collections[groupName]){
+          return briefcase.collections[groupName]
+        }
+
+        return briefcase.collections[groupName] = collection(function(){
+          return briefcase.selectModelsByType(type_alias)
+        }, modelDefinition)
+      }
+    })
+
+  } catch(e){
+
+  }
+}
+

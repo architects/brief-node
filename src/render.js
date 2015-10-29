@@ -7,6 +7,7 @@ import normalize from 'mdast-normalize-headings'
 import visit from 'unist-util-visit'
 import cheerio from 'cheerio'
 import {clone,slugify} from './util'
+import strings from 'underscore.string'
 
 const processor = mdast.use([yaml,squeeze,normalize,html])
 
@@ -29,22 +30,30 @@ export function parse(document) {
   return ast 
 }
 
-export function process(document) {
+export function process(document, briefcase) {
   document.content = readPath(document.path)
 
   document.ast = parse(document)
   document.runHook("documentWillRender", document.ast)
   
+  resolveLinks(document, briefcase)
   nestElements(document)
   collapseSections(document)
   applyWrapper(document)
 
-  document.html = stringify(document.ast)
+  Object.defineProperty(document, 'html', {
+    configurable: true,
+    get: function(){
+      processLinks(document, briefcase)
+      return stringify(document.ast)
+    }
+  })
+
   document.$ = function(selector){
     return cheerio.load(document.html)(selector)
   }
 
-  document.runHook("documentDidRender", document.html)
+  document.runHook("documentDidRender", document)
 
   return document
 }
@@ -164,4 +173,38 @@ function applyWrapper (document) {
     },
     children: document.ast.children
   }]
+}
+
+function resolveLinks(document, briefcase){
+  if(!briefcase){ return }
+
+  visit(document.ast, 'link', function(node){
+    let pathAlias = node.href
+
+    let children = node.children || []
+    let textNode = node.children.find(node => node.type === 'text')
+
+    if(textNode && textNode.value.match(/link\:/)){
+      node.href = briefcase.resolveLink(pathAlias)
+      node.htmlAttributes = node.htmlAttributes || {}
+      node.htmlAttributes['data-link-to'] = pathAlias
+    }
+  })
+}
+
+function processLinks(document, briefcase){
+  visit(document.ast, 'link', function(node){
+    if(node.htmlAttributes && node.htmlAttributes['data-link-to']){
+      let linkedDocument = briefcase.at(node.htmlAttributes['data-link-to'])
+      let textNode = node.children.find(node => node.type === 'text')
+
+      if(textNode && textNode.value.match(/link\:/)){
+        textNode.value = strings.strip(textNode.value.replace(/link\:/,''))
+
+        if(linkedDocument && textNode.value === 'title'){
+          textNode.value = linkedDocument.title
+        }
+      }
+    }
+  })
 }

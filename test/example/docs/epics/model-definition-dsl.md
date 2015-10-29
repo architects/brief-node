@@ -8,6 +8,8 @@ project: Brief
 
 The Model Definition DSL allows the writer to define the model classes which power the documents she writes.
 
+[link:title](projects/brief)
+
 ## Features
 
 ### A User can describe the metadata schema

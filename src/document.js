@@ -28,14 +28,19 @@ export default class Document {
       this.type = this.options.type
     }
 
-    process(this)
+    process(this, this.getBriefcase())
   }
   
+  resolveLink(pathAlias){
+    return this.getBriefcase().resolveLink(pathAlias)
+  }
+
   /**
   * return a reference to the briefcase this document belongs to.
   */
   getBriefcase(){
-    return brief.findBriefcaseByPath(this.path)
+    if(this.briefcase) { return this.briefcase }
+    return this.briefcase = brief.findBriefcaseByPath(this.path)
   }
   /**
    * get a model to represent this document and the data we parse from it.
