@@ -1,5 +1,0 @@
-- Finish Model DSL Implementation
-- Finish CLI Implementation
-- Plugin Architecture 
-- App Repositories
-- Renderer Plugins
