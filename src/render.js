@@ -190,6 +190,23 @@ function resolveLinks(document, briefcase){
       node.htmlAttributes = node.htmlAttributes || {}
       node.htmlAttributes['data-link-to'] = pathAlias
     }
+
+    if(textNode && textNode.value.match(/embed\:/)){
+      let asset = briefcase.assets.at(node.href)
+
+      if(asset){
+        node.type = "unknown"
+        node.data = {
+          htmlAttributes:{
+            name: "div"
+          }
+        }
+        node.children = [{
+          type: "text",
+          value: strings.unescapeHTML(asset.content)
+        }]
+      }
+    }
   })
 }
 

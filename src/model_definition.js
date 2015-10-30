@@ -8,6 +8,7 @@ import DocumentSection from './document_section'
 import Model from './model'
 import Collection from './collection'
 import registry from './model_registry'
+import {ExtractionRule} from './extractions'
 
 const inflections = inflect()
 
@@ -19,7 +20,7 @@ const dsl = {
     let current = ModelDefinition.last()
     return current.toPrototype()
   },
-
+  
   define: function( modelName, options = {} ) {
     let current = definitions[modelName]
     definitions[modelName] = current || new ModelDefinition(modelName, options)
@@ -68,6 +69,11 @@ const dsl = {
   action: function (name, handler) {
     let current = ModelDefinition.last()
     return current.defineAction(name, handler)
+  },
+
+  get extract(){
+    let current = ModelDefinition.last()
+    return new ExtractionRule()
   }
 }
 
@@ -80,7 +86,8 @@ const dsl_methods = [
   "actions",
   "close",
   "hasMany",
-  "belongsTo"
+  "belongsTo",
+  "extract"
 ]
 
 
@@ -110,7 +117,7 @@ export default class ModelDefinition {
   }
 
   static setupDSL () {
-    dsl_methods.forEach(method => global[method] = dsl[method])    
+    dsl_methods.forEach(method => global[method] = dsl[method])
   }
 
   static cleanupDSL () {

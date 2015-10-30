@@ -58,6 +58,13 @@ export default class Briefcase {
     this.setup()
   }
   
+  /** 
+  * Return the outline for this briefcase if it exists.
+  */
+  get outline(){
+    return this.at('outline.md')
+  }
+
   get index(){
     if(__documentIndexes[this.root]){
       return __documentIndexes[this.root]
@@ -376,6 +383,7 @@ function buildIndexFromDisk(briefcase) {
 
 function loadModelDefinitions(briefcase){
   ModelDefinition.loadDefinitionsFromPath(briefcase.config.models_path)
+  ModelDefinition.loadDefinitionsFromPath(__dirname + '/models')
 
   ModelDefinition.getAll().forEach(function(definition){
     briefcase.loadModel(definition)

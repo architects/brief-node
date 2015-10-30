@@ -31,3 +31,26 @@ export class CodeExtraction {
     return this.model.document.getCodeBlocks()
   }
 }
+
+export class ExtractionRule {
+  get the(){ return this }
+  
+  type: "single"
+
+  first(selector){
+    this.type = "single"
+    this.selector = selector
+    return this
+  }
+  
+  all(selector){
+    this.type = "multiple"
+    this.selector = selector
+    return this
+  }
+
+  as(attributeName){
+    this.attributeName = attributeName
+    return this
+  }
+}
