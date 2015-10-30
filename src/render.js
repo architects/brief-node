@@ -38,6 +38,7 @@ export function process(document, briefcase) {
   
   resolveLinks(document, briefcase)
   nestElements(document)
+  processCodeBlocks(document, briefcase)
   collapseSections(document)
   applyWrapper(document)
 
@@ -206,5 +207,30 @@ function processLinks(document, briefcase){
         }
       }
     }
+  })
+}
+
+function processCodeBlocks(document, briefcase){
+  let index = 0
+
+  let parser = require('js-yaml')
+
+  visit(document.ast, 'code', function(node){
+    let data = node.data = node.data || {}
+    let attrs = node.data.htmlAttributes = node.data.htmlAttributes || {}
+    
+    attrs.id = attrs.id || "block-" + index
+
+    if(node.lang && (node.lang === 'yaml' || node.lang === 'yml')){
+      if(node.value && !node.yaml){
+        try {
+          node.yaml = parser.safeLoad(node.value)
+        } catch(e){
+
+        }
+      }
+    }
+
+    index = index + 1
   })
 }
