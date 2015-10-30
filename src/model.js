@@ -4,6 +4,7 @@ import inflect from 'i'
 import Document from './document'
 import ModelDefinition from './model_definition'
 import Briefcase from './briefcase'
+import { CodeExtraction } from './extractions'
 import {fragment} from './render'
 
 const flatten = _.flatten
@@ -233,5 +234,9 @@ export default class Model {
   
   get modelDefinition(){
     return ModelDefinition.lookup(this.type)
+  }
+
+  get codeBlocks(){
+    return new CodeExtraction(this) 
   }
 }

@@ -111,10 +111,19 @@ export default class Document {
     delete(this.sections)
     delete(this.data)
     delete(this.content)
+    delete(this.codeBlocks)
 
     process(this, this.briefcase)
   }
   
+  getCodeBlocks() {
+    if(this.codeBlocks){ return this.codeBlocks }
+
+    this.codeBlocks = []
+    this.visit('code', node => this.codeBlocks.push(node))
+    return this.codeBlocks = this.codeBlocks.reverse()
+  }
+
   getSectionHeadings(){
     return this.getSectionNodes().map(section => section.heading)
   }
