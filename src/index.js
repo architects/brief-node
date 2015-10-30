@@ -62,6 +62,8 @@ let brief = {
   },
   fromPath: function(pathname, options){
     if(fs.existsSync(pathname + './package.json')){
+      console.log("Loading briefcase from the package.json manifest at", pathname)
+
       return brief.fromManifest(pathname + './package.json', options)
     }
     return brief.load(pathname, options)
@@ -78,7 +80,7 @@ let brief = {
     }
 
     usesPlugins.forEach(pluginName => {
-      brief.use(require('brief-plugins-' + pluginName))
+      brief = brief.use(require('brief-plugins-' + pluginName))
     })
 
     return brief.load(path.dirname(briefcaseManifestPath), options)
