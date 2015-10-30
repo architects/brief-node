@@ -2,7 +2,10 @@ define("Outline")
 
 attributes("title")
 
-extract.the.first("main h1").as("title")
+extract("main h1", {
+  as: "title",
+  first: true
+})
 
 section("Table of Contents")
   .hasMany("Sections", {
@@ -44,3 +47,5 @@ action("generate documents", function(params) {
     briefcase.createDocument(modelClass, {title: documentTitle})
   })
 })
+
+exports = close()

@@ -28,6 +28,11 @@ const dsl = {
     return current
   },
 
+  extend: function( modelName, options = {}) {
+    let current = definitions[modelName]
+    return current
+  },
+
   attributes: function (...list) {
     let current = ModelDefinition.last()
     return current.defineAttributes(list)
@@ -70,15 +75,16 @@ const dsl = {
     let current = ModelDefinition.last()
     return current.defineAction(name, handler)
   },
-
-  get extract(){
+  
+  extract: function(selector, options={}){
     let current = ModelDefinition.last()
-    return new ExtractionRule()
+    return current.addExtractionRule(selector, options={}) 
   }
 }
 
 const dsl_methods = [
   "define",
+  "extend",
   "attributes",
   "attribute",
   "section",
@@ -182,10 +188,17 @@ export default class ModelDefinition {
     this.sections = {}
     this.actions = {}
     this.relationships = {}
+    this.extractionRules = []
 
     //store a reference in the bucket
     definitions[this.name] = this
     type_aliases[this.type_alias] = this.name
+  }
+
+  addExtractionRule(options={}){
+    let rule = new ExtractionRule(options)
+    this.extractionRules.push(rule)
+    return this
   }
   
   finalizeRelationships(){

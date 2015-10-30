@@ -6,7 +6,7 @@ import DataSource from './data_source'
 import Model from "./model"
 import Document from "./document"
 import ModelDefinition from "./model_definition"
-import {model, registry} from './model_registry'
+import {model, registry, getModelPrototype} from './model_registry'
 import Generator from './generator'
 import {markdown} from './render'
 import {mixin} from './util'
@@ -20,7 +20,9 @@ const manifest = JSON.parse(fs.readFileSync(pkg))
 let brief = {
   VERSION: manifest.version,
   plugins: plugins,
+
   Briefcase: Briefcase,
+
   Model: Model,
    
   ModelDefinition: ModelDefinition,
@@ -29,6 +31,10 @@ let brief = {
   // Think of a better API for this.
   registry: registry,
   model: model,
+  
+  getModelPrototype: function(nameOrTypeAlias, guess = true){
+    return getModelPrototype(nameOrTypeAlias, guess)
+  },
 
   resolveLink: function(pathAlias){
     if(!brief.linkResolver){

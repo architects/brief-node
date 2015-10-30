@@ -11,9 +11,15 @@ displayed. This opens up some possibilities.
 We could use YAML Blocks like this:
 
 ```yaml
-replaceWith: visualization
-visualizationType: MyCustomReport
-parameters: whatever
+deserialized: true
+cool: yes
 ```
 
-And replace that node with a custom visualization.
+We could also treat YAML blocks as hidden data like this:
+
+```data
+key: settings
+note: this will not be rendered
+```
+
+This will extract this data and store it on the document.

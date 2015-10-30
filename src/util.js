@@ -4,6 +4,10 @@ import strings from 'underscore.string'
 
 const inflections = inflect()
 
+export function extend(...args){
+  return _.extend(...args)
+}
+
 /**
 * clone an object
 *

@@ -22,6 +22,10 @@ export function loadPath(path){
   }
 }
 
+export function getModelPrototype(nameOrTypeAlias, guess = true){
+  return model(nameOrTypeAlias, guess).toPrototype()
+}
+
 export function model(nameOrTypeAlias, guess=true){
   let models = registry.models
   let alias = registry.aliases[nameOrTypeAlias]

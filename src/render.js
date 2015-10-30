@@ -6,7 +6,7 @@ import squeeze from 'mdast-squeeze-paragraphs'
 import normalize from 'mdast-normalize-headings' 
 import visit from 'unist-util-visit'
 import cheerio from 'cheerio'
-import {clone,slugify} from './util'
+import {clone,slugify,extend} from './util'
 import strings from 'underscore.string'
 
 const processor = mdast.use([yaml,squeeze,normalize,html])
@@ -230,22 +230,42 @@ function processLinks(document, briefcase){
 function processCodeBlocks(document, briefcase){
   let index = 0
 
-  let parser = require('js-yaml')
+  let parser
 
   visit(document.ast, 'code', function(node){
     let data = node.data = node.data || {}
     let attrs = node.data.htmlAttributes = node.data.htmlAttributes || {}
     
     attrs.id = attrs.id || "block-" + index
-
-    if(node.lang && (node.lang === 'yaml' || node.lang === 'yml')){
+    
+    if(node.lang === 'yaml' || node.lang === 'yml' || node.lang === 'data'){
+      parser = parser || require('js-yaml')
+      
       if(node.value && !node.yaml){
         try {
           node.yaml = parser.safeLoad(node.value)
         } catch(e){
-
+          document.log("Error parsing yaml", e.message)
         }
       }
+
+      if(node.lang === 'data' && node.yaml){
+        let key = node.yaml.key
+        
+        if(key){
+          delete(node.yaml.key)
+
+          Object.defineProperty(document.data, key, {
+            value: node.yaml
+          })
+
+          node.yaml.key = key
+        } else {
+          document.log("Can't process a data yaml block without a key property")
+        }
+      }
+
+      node.lang = 'yaml'
     }
 
     index = index + 1

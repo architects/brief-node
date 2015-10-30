@@ -27,10 +27,20 @@ export default class Document {
     if(this.options.type){
       this.type = this.options.type
     }
+    
+    this.renderLog = []
 
     process(this, this.getBriefcase())
   }
   
+  log(...messages){
+    this.renderLog.push(messages)
+  }
+
+  viewLog(){
+    this.renderLog.forEach(console.log.bind(console))
+  }
+
   resolveLink(pathAlias){
     return this.getBriefcase().resolveLink(pathAlias)
   }
@@ -121,7 +131,7 @@ export default class Document {
 
     this.codeBlocks = []
     this.visit('code', node => this.codeBlocks.push(node))
-    return this.codeBlocks = this.codeBlocks.reverse()
+    return this.codeBlocks
   }
 
   getSectionHeadings(){

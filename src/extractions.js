@@ -33,9 +33,11 @@ export class CodeExtraction {
 }
 
 export class ExtractionRule {
-  get the(){ return this }
-  
   type: "single"
+
+  valid: false
+
+  get the(){ return this }
 
   first(selector){
     this.type = "single"
@@ -51,6 +53,7 @@ export class ExtractionRule {
 
   as(attributeName){
     this.attributeName = attributeName
+    this.valid = true
     return this
   }
 }

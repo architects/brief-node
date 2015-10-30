@@ -7,4 +7,6 @@ describe "The Outline", ->
   it "should have an outline document", ->
     typeof(outline).should.not.equal('undefined')
 
+  it "should define some extraction rules", ->
+    briefcase.getModelDefinition("outline").extractionRules.length.should.not.equal(0)
 
