@@ -32,7 +32,6 @@ let brief = {
 
   resolveLink: function(pathAlias){
     if(!brief.linkResolver){
-      console.log("There is no link resolver")
       return pathAlias
     }
     return brief.linkResolver(pathAlias)
