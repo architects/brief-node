@@ -5,7 +5,7 @@ import Document from './document'
 import ModelDefinition from './model_definition'
 import Briefcase from './briefcase'
 import { CodeExtraction } from './extractions'
-import {fragment} from './render'
+import {fragment} from './pipelines'
 
 const flatten = _.flatten
 const string = inflect()

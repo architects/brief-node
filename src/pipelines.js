@@ -11,10 +11,113 @@ import strings from 'underscore.string'
 
 const processor = mdast.use([yaml,squeeze,normalize,html])
 
+/** Note
+*   This needs to be optimized as there are turning out to be
+*   way to many passes over the ast.
+*/
+
+// Plugins should be able to tap into this
+let pipelines = {
+  get processing(){
+    return [
+      resolveLinks,
+      nestElements,
+      processCodeBlocks,
+      removeNodes
+    ] 
+  },
+  
+  get structuring(){
+    return [
+      collapseSections,
+      applyWrapper
+    ]
+  },
+
+  get rendering(){
+    return [
+      processLinks,
+      renderVisualizations
+    ]
+  }
+}
+
+/* if any of the nodes have been marked for delete this will remove them and make sure they
+* don't get rendered in the output */
+function removeNodes(document, briefcase){
+  visit(document.ast, node => {
+    if(node.children){ node.children = node.children.filter(child => !child.markForDelete) }
+  })
+}
+
+/* if code block nodes have been tagged visualizations we need to generate html for their content */
+function renderVisualizations(document, briefcase){
+  visit(document.ast, 'unknown', node => {
+    if(node.visualization){
+      let visualization = require(briefcase.config.views_path + '/' + node.visualization)
+      let data = node.yaml || {}
+      let html = visualization(data, document, briefcase)
+      let id = node.data.htmlAttributes.id
+
+      node.children[0].value = strings.unescapeHTML(html)
+    }
+  })
+}
+
+/**
+* process a brief document. this involves manipulating 
+* the ast from mdast so that our rendered output is nested
+* in a hierarchy of main, section, article html tags.
+*
+* other functions are performed during this operation to
+* assist in extracting data from the writing, generating
+* links to other documents in the briefcase, and more.
+*
+*/
+export function process(document, briefcase) {
+  document.content = readPath(document.path)
+
+  document.ast = parse(document)
+  document.runHook("documentWillRender", document.ast)
+ 
+  // these are broken up because it is easier to transform
+  // certain nodes when they aren't deeply nested in the sections
+  // we need
+  pipelines.processing.forEach(fn => fn(document, briefcase))
+  
+  // these are responsible for nesting the flat markdown elements
+  // in a more hierarchal structure based on the heading levels and titles
+  pipelines.structuring.forEach(fn => fn(document, briefcase))
+
+  Object.defineProperty(document, 'html', {
+    configurable: true,
+    get: function(){
+      pipelines.rendering.forEach(fn => fn(document, briefcase))
+
+      let html = stringify(document.ast)
+
+      return html
+    }
+  })
+
+  document.$ = function(selector){
+    return cheerio.load(document.html)(selector)
+  }
+
+  document.runHook("documentDidRender", document)
+
+  return document
+}
+
 export function markdown(){
   return processor
 }
 
+/** 
+* parses a brief document and extracts
+* the yaml frontmatter as `document.data`
+*
+*/
 export function parse(document) {
   let parsed = processor.parse(document.content),
       nodes  = parsed.children
@@ -30,34 +133,6 @@ export function parse(document) {
   return ast 
 }
 
-export function process(document, briefcase) {
-  document.content = readPath(document.path)
-
-  document.ast = parse(document)
-  document.runHook("documentWillRender", document.ast)
-  
-  resolveLinks(document, briefcase)
-  nestElements(document)
-  processCodeBlocks(document, briefcase)
-  collapseSections(document)
-  applyWrapper(document)
-
-  Object.defineProperty(document, 'html', {
-    configurable: true,
-    get: function(){
-      processLinks(document, briefcase)
-      return stringify(document.ast)
-    }
-  })
-
-  document.$ = function(selector){
-    return cheerio.load(document.html)(selector)
-  }
-
-  document.runHook("documentDidRender", document)
-
-  return document
-}
 
 export function fragment(ast, options={}) {
   return stringify({
@@ -237,10 +312,10 @@ function processCodeBlocks(document, briefcase){
     let attrs = node.data.htmlAttributes = node.data.htmlAttributes || {}
     
     attrs.id = attrs.id || "block-" + index
-    
+
     if(node.lang === 'yaml' || node.lang === 'yml' || node.lang === 'data'){
       parser = parser || require('js-yaml')
-      
+            
       if(node.value && !node.yaml){
         try {
           node.yaml = parser.safeLoad(node.value)
@@ -260,9 +335,17 @@ function processCodeBlocks(document, briefcase){
           })
 
           node.yaml.key = key
+          node.markForDelete = true
         } else {
           document.log("Can't process a data yaml block without a key property")
         }
+      }
+      
+      // TBD whether we require visualization or view as the key
+      if(node.yaml && (node.yaml.visualization || node.view)){
+        node.visualization = (node.yaml.visualization || node.view)
+        node.type = 'unknown'
+        node.children = [{type:'text',value:'VISUALIZATION'}]
       }
 
       node.lang = 'yaml'

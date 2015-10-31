@@ -7,7 +7,7 @@ import path from 'path'
 import brief from './index'
 import Model from './model'
 import Presenter from "./presenter"
-import {process, parse} from './render'
+import {process, parse} from './pipelines'
 import {clone, singularize} from './util'
 
 export default class Document {

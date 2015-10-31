@@ -8,7 +8,7 @@ import Document from "./document"
 import ModelDefinition from "./model_definition"
 import {model, registry, getModelPrototype} from './model_registry'
 import Generator from './generator'
-import {markdown} from './render'
+import {markdown} from './pipelines'
 import {mixin} from './util'
 
 const plugins = []

@@ -52,7 +52,8 @@ export default class Briefcase {
       docs_path: path.join(this.root, 'docs'),
       models_path: path.join(this.root, 'models'),
       assets_path: path.join(this.root, 'assets'),
-      data_path: path.join(this.root, 'data')
+      data_path: path.join(this.root, 'data'),
+      views_path: path.join(this.root, 'views')
     }
     
     this.setup()
