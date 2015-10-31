@@ -1,31 +1,13 @@
 #!/usr/bin/env node
 'use strict';
 
-var stderr = process.stderr;
-var argv = process.argv;
-
-var exitStatus = 0;
-
-var cli = require('../lib/cli')
-
-function fail(exception, success) {
-  if (exception) {
-      stderr.write((exception.stack || exception) + '\n');
-  }
-
-  if (exception || !success) {
-      exitStatus = 1;
-  }
-}
-
-var position = argv.indexOf('--');
-
-if (position !== -1) {
-    argv = argv.slice(0, position);
-}
-
-cli(argv, fail);
-
-process.on('exit', function () {
-  process.exit(exitStatus);
-});
+/**
+*
+* I should be able to do things like:
+*
+* - generate new briefcases
+* - write new documents for the briefcase
+* - dispatch actions to models
+* - dispatch commands to the briefcase
+*
+*/

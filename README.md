@@ -1,178 +1,94 @@
-# Brief: The Active Writing Framework
+# The Active Writing Framework
 
-Markdown is great for writers who want to present their writing in
-a neatly formatted way. Brief builds on top of Markdown's usefulness
-as a presentation format and communication tool, by providing an easy way to 
-build database applications and custom functionality on top of collections 
-of markdown documents.
+Brief provides you with a set of tools to create "Reactive Documents"
+with markdown and javascript.
 
-Brief lets you use YAML frontmatter, and a simple system for defining
-attributes as CSS selectors to add a queryable data object layer on top
-of these collections.  It also lets you treat individual documents as
-objects, with a set of attributes that you can change in code.  These
-updates will get saved in your markdown.
+Reactive Documents are written in markdown and brought to life through
+the use of flexible, programmable model classes which do things like
+define the structure of the documents and different metadata attributes.
 
-This lets you render the document as simple HTML as you might normally
-do, but also as JSON so that you can treat the content as data as well. 
+### Briefcases
 
-## Getting Started
+A Briefcase is the parent project owns all of the different assets,
+documents, data sources, visualizations, and what ever else.  Briefcases
+package up all of these things and wrap them up in a javascript bundle
+that can be `required()` like any other npm package or module.
 
-```
-npm install brief-node
-brief use sample project
-```
-
-This will create a sample project.  Our example will use a cookbook.
-
-```
-- assets
-  - images
-    - breakfast.svg
-    - syrup.jpg
-- docs
-  - cookbooks
-    - breakfast.md
-  - ingredients
-    - artisinal-butter.md
-    - small-batch-syrup.md
-  - recipes
-    - french-toast.md
-- models
-  - recipe.js
-  - ingredient.js
-  - cookbook.js
-- index.js
-```
-
-## Interacting via the CLI tool
-
-```
-cd sample
-brief write recipe # => Opens in $EDITOR
-brief publish recipe # => Publishes the recipe somewhere 
-```
-
-## Interacting via JSON 
-
-```javascript
-var cookbook = require('./path/to/cookbook')()
-
-var syrup = cookbook.ingredients.find_by_name('Artisinal Butter')
-
-if(syrup.inStock < 5) { grocery_store_api.place_order(syrup) }
-
-var menu = new Menu()
-
-cookbook.recipes.forEach(recipe => {
-  menu.addItem(recipe)
-})
-
-menu.saveAsPDF()
-menu.publishToMyWebsite()
-```
-
-This lets a chef use markdown files that contain writing and notes about his recipes and ingredients to a) generate menu PDFs b) publish the menu to his website c) order ingredients which are almost out of stock.
-
-## Briefcases.
-
-Briefcases are collections of related documents.  These documents can
-be of varying types.  Each type of Document will be backed by a Model
-class which allows you to do things to the document such as update
-attributes about it, generate reports, or use the content and data in
-that document to interact with different APIs. 
+Briefcases can rely on plugins to define reusable sets of models with 
+relationships between them.  Maybe it is a cookbook, a software project
+management wiki, an interactive style guide for a website. Brief
+provides the ultimate level of flexibility and customization to writers.
 
 ### Documents
 
-A Brief Document is a markdown document with YAML Frontmatter.  The
-content of the document is completely up to the writer, however the
-power of this application really shines when we define different types
-of Documents and provide some information about how they should be
-structured and how they may relate to each other.
-
-We do this using models.  
-
-Given the following markdown content:
-
-```markdown
----
-type: recipe
-title: French Toast
----
-
-# French Toast
-
-Delicious.
-
-## Ingredients
-
-- Bread
-- Eggs
-```
-
-we would expect to see a model called `Recipe` which defines the things
-we can do with this writing.
+Documents are markdown files with YAML frontmatter.  Documents are
+expected to follow a consistent structure based on the type of model
+that you intend to power with that writing, if any.  A Document's
+relationship to the model classes you define is based on the `type`
+parameter defined in YAML, or the name of the folder the document
+resides in relative to the Briefcase's `config.docs_path`
 
 ### Models
 
-Models are guidelines for the structure of Brief Documents.  They define
-things like the expected metadata attributes that will be found in the
-YAML frontmatter.  
-
-They also define things like section headings, and what we should expect
-to see in the subheadings which are nested underneath them.  
-
-Brief Models provide a way for parsing the document structure and
-creating a set of data attributes which enhance the metadata that is
-present. 
-
-The Model System allows you to generate reports, visualizations, or
-develop integrations between the different instances of models and
-various APIs that you can work with from within Javascript.
+Models can be defined to represent different types of documents. Models
+can have relationships with other models.  You can do things with
+models.  Models are given attributes based on the content of the
+document, and the data it contains.
 
 ### Assets
 
 A Briefcase project can include `svg, png, jpg, gif, html, css, js`
 files in an assets folder.  These assets will be bundled with the
-project when it gets exported as a single JSON structure.
+project when it gets exported as a single JSON structure.  These
+documents can be embedded directly in the rendered HTML by using special 
+link tag syntax such as:
+
+```markdown
+[embed:asset](folder/asset-name)
+```
+
+This will embed the asset in `briefcase.config.assets_path + 'folder/asset-name.svg`
 
 ### Data Sources
 
 A Briefcase project can include `json, yaml, csv` file types in the data
 folder.  These will get treated as data sources and bundled with the
-project when it gets exported as a single JSON structure.
+project when it gets exported as a single JSON structure. 
 
-### Special Markdown Syntax Elements
+Data sources are useful ways of powering visualizations that get
+embedded in your document.
 
-Link tags, and Fenced code blocks can implement special syntax that
-gives you fine grained control over how assets and data sources for
-example, can be incorporated to embed visualizations in the rendered
-markdown output.
+### Visualizations
 
-An example of how you might link to other documents:
+A Briefcase can include javascript files in `briefcase.config.views_path`.
 
-```markdown
+These javascript files are expected to export a function and return some HTML.
 
-# My Heading
+In your documents, you include a YAML block like:
 
-Here is a link:
-
-[link:title](projects/brief)
+```yaml
+visualization: my_custom_visualization
+data: whatever
 ```
 
-This link tag will create a link to the `projects/brief` document, using
-its title as the text for the link.
+The content of this block will be replaced with whatever gets returned from the javascript function.
 
-What value is used for the href of this link can be configured by
-supplying your own link resolver function.
+This is a great way to embed visualizations, charts, interactive components, or whatever else you want inside of your writing.
 
-```es6
-let brief = require('brief-node')
-let briefcase = brief.example()
+### Plugins
 
-briefcase.resolver.forLinks(function(id){
-  return "http://architects.io" + id
-})
-```
+Brief's behavior can be extended through a simple plugin system.  Plugins can bundle up re-usable model definitions that help automate repetitive scenarios that require a lot of writing.  In practice, we use it to automate the project management and specifications documents for our software development business.
+
+Some of the plugins we maintain:
+
+- [https://github.com/architects/brief-plugins-blueprint](Blueprint) is
+  used to write about software projects and the software development
+  lifecycle.  We use this plugin to power our domain driven design
+  consulting practice.
+
+- [https://github.com/architects/brief-plugins-retext](Retext) this
+  plugin provides us with the ability to do language and keyword
+  analysis on large collections of written documents.  
 
 ### Acknowledgements
 

@@ -9,6 +9,8 @@ attributes(
 
 belongsTo("project", {references: "title"})
 
+// note, this api never worked and i like
+// the more explicit one i use in the outline model better
 attribute("subheading").extract("main h2")
 
 section("Features")
