@@ -1,5 +1,7 @@
 define("Page")
 
+description("Pages store general content")
+
 attributes(
   "title", 
   "status", 

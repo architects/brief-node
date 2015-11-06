@@ -28,6 +28,9 @@ describe "A Model Definition", ->
   it "should define some attributes", ->
     definition.attributeNames().should.containEql('title','status','project')
 
+  it "should store a description", ->
+    briefcase.getModelDefinition('page').description.should.equal('Pages store general content')
+
 describe "Accesing models", ->
   it "should be able to find the model instances created against it", ->
     definition = briefcase.getModelDefinition('epic')

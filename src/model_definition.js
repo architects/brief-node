@@ -70,6 +70,13 @@ const dsl = {
     let current = ModelDefinition.last()
     return current.defineSection(name, options)
   },
+  
+  description: function(description){
+    let current = ModelDefinition.last()
+    current.description = description
+    return current
+  },
+
 
   action: function (name, handler) {
     let current = ModelDefinition.last()
@@ -89,6 +96,7 @@ const dsl_methods = [
   "attribute",
   "section",
   "action",
+  "description",
   "actions",
   "close",
   "hasMany",
@@ -189,6 +197,7 @@ export default class ModelDefinition {
     this.actions = {}
     this.relationships = {}
     this.extractionRules = []
+    this.description = ""
 
     //store a reference in the bucket
     definitions[this.name] = this
