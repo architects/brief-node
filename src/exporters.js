@@ -30,6 +30,9 @@ function standard(briefcase, options={}){
   })
 
   return {
+    name: briefcase.name,
+    root: briefcase.root,
+    options: briefcase.options,
     index: index,
     config: briefcase.config,
     manifest: briefcase.manifest || {},
