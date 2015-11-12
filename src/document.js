@@ -7,7 +7,7 @@ import path from 'path'
 import brief from './index'
 import Model from './model'
 import Presenter from "./presenter"
-import {process, parse} from './pipelines'
+import {process, parse, readPath} from './pipelines'
 import {clone, singularize} from './util'
 
 export default class Document {
@@ -27,10 +27,18 @@ export default class Document {
     if(this.options.type){
       this.type = this.options.type
     }
-    
-    this.renderLog = []
 
+    this.renderLog = []
+    
+    this.loadContent({path: this.path})
     process(this, this.getBriefcase())
+  }
+
+  loadContent(options = {}){
+    if(options.content){ return this.content = options.content }
+    if(options.path){ return this.content = readPath(options.path) }
+
+    if(options.reload){ this.reload() }
   }
   
   log(...messages){
@@ -64,7 +72,11 @@ export default class Document {
   writeSync(newContent){
     newContent = newContent || this.content
     fs.writeFileSync(this.path, newContent)
-    this.reload()
+
+    this.loadContent({
+      path: this.path,
+      reload: true
+    })
   }
 
   lastModifiedAt(){
@@ -120,7 +132,6 @@ export default class Document {
     delete(this.articles)
     delete(this.sections)
     delete(this.data)
-    delete(this.content)
     delete(this.codeBlocks)
 
     process(this, this.briefcase)

@@ -75,7 +75,6 @@ function renderVisualizations(document, briefcase){
 *
 */
 export function process(document, briefcase) {
-  document.content = readPath(document.path)
 
   document.ast = parse(document)
   document.runHook("documentWillRender", document.ast)
@@ -145,7 +144,7 @@ export function stringify(ast, options={}) {
   return processor.stringify(ast, options)
 }
 
-function readPath(path) {
+export function readPath(path) {
   return fs.readFileSync(path).toString()
 }
 
