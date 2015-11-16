@@ -243,7 +243,8 @@ function applyWrapper (document) {
     data:{
       htmlName: "main",
       htmlAttributes:{
-        "class": "brief-document"
+        "class": "brief-document",
+        "id": document.id
       }
     },
     children: document.ast.children
