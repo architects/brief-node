@@ -23,6 +23,7 @@ export default class Document {
     this.options = options || {}
     this.path = pathname
     this.dirname = path.dirname(this.path)
+    this.id = options.id
 
     if(this.options.type){
       this.type = this.options.type
