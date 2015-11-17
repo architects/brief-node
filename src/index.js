@@ -42,9 +42,11 @@ let brief = {
     }
     return brief.linkResolver(pathAlias)
   },
+
   resolveLinksWith: function(fn){
     brief.linkResolver = fn
   },
+
   instances: function(){
     return Briefcase.instances()
   },

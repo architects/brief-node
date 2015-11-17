@@ -1,6 +1,10 @@
 let __cache = {}
 
 export default class Resolver {
+  /*
+  * we should eliminate the caching here as it doesn't
+  * make sense
+  */
   static create(briefcase){
     let existing = __cache[briefcase.root]
     if(existing) { return existing }
@@ -14,7 +18,7 @@ export default class Resolver {
   }
   
   forLinks(linkResolver){
-    this.linkResolver = linkResolver  
+    this.linkResolver = linkResolver
   }
 
   forAssets(assetPathResolver){

@@ -240,13 +240,13 @@ function collapseSections (document){
 function applyWrapper (document) {
   document.ast.children = [{ 
     type: "unknown",
-    id: document.id || document.path,
+    id: document.slug,
     data:{
       htmlName: "main",
-      id: document.id || document.path,
+      id: document.slug,
       htmlAttributes:{
         "class": "brief-document",
-        "id": document.id || document.path
+        "id": document.slug
       }
     },
     children: document.ast.children

@@ -8,7 +8,7 @@ import brief from './index'
 import Model from './model'
 import Presenter from "./presenter"
 import {process, parse, readPath} from './pipelines'
-import {clone, singularize} from './util'
+import {clone, slugify, singularize} from './util'
 
 export default class Document {
   toString() {
@@ -33,6 +33,10 @@ export default class Document {
     
     this.loadContent({path: this.path})
     process(this, this.getBriefcase())
+  }
+  
+  get slug(){
+    return slugify(this.options.id || this.id)
   }
 
   loadContent(options = {}){
