@@ -59,7 +59,7 @@ function renderVisualizations(document, briefcase){
       let html = visualization(data, document, briefcase)
       let id = node.data.htmlAttributes.id
 
-      node.children[0].value = strings.unescapeHTML(html)
+      node.children[0].value = html 
     }
   })
 }
@@ -93,7 +93,7 @@ export function process(document, briefcase) {
     get: function(){
       pipelines.rendering.forEach(fn => fn(document, briefcase))
 
-      let html = stringify(document.ast)
+      let html = strings.unescapeHTML(stringify(document.ast))
 
       return html
     }

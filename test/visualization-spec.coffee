@@ -5,3 +5,4 @@ describe "Visualizations", ->
 
     html.should.not.match(/VISUALIZATION/)
     html.should.match(/Look I rendered your visualiation/)
+    html.should.not.match(/\&gt\;/)
