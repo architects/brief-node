@@ -3,6 +3,7 @@ import glob from 'glob-all'
 import path from 'path'
 import inflections from 'i'
 import _ from 'underscore'
+import Logger from 'bunyan'
 
 import brief from '..'
 import Asset from './asset'
@@ -47,7 +48,22 @@ export default class Briefcase {
 
     this.model_definitions = {}
     this.collections = {}
-    
+
+
+    let logger = {
+      name: "briefcase-" + this.name,
+      streams:[{
+        stream: process.stdout,
+        level: 'debug'
+      }]
+    }
+  
+    if(options.log_path){
+      logger.streams.push({ path: options.log_path, level: trace })
+    }
+
+    this.logger = new Logger(logger)
+
     this.config = {
       docs_path: path.join(this.root, 'docs'),
       models_path: path.join(this.root, 'models'),
