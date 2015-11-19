@@ -54,7 +54,22 @@ function removeNodes(document, briefcase){
 function renderVisualizations(document, briefcase){
   visit(document.ast, 'unknown', node => {
     if(node.visualization){
-      let visualization = require(briefcase.config.views_path + '/' + node.visualization)
+      let visualization
+      
+      try {
+        if(fs.existsSync(briefcase.config.views_path + '/' + 'index.js')){
+          visualization = require(briefcase.config.views_path + '/' + 'index.js')[node.visualization]
+        }
+
+        if(fs.existsSync(briefcase.config.views_path + '/' + node.visualization + '.js')){
+          visualization = require(briefcase.config.views_path + '/' + node.visualization + '.js')
+        }
+      } catch(e){
+        document.log("Error rendering visualization: " + e.message)
+      }
+      
+      if(typeof(visualization)!=="function"){ return '' }
+
       let data = node.yaml || {}
       let html = visualization(data, document, briefcase)
       let id = node.data.htmlAttributes.id

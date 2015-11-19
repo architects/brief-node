@@ -46,3 +46,15 @@ describe "The Document", ->
     headings.should.containEql('A User can describe the metadata schema')
     headings.should.containEql('A User can define attributes using CSS selectors')
 
+describe "Changing Document Content", ->
+  document = briefcase.epics.first().document
+  document.content.should.not.match(/CHANGED THE CONTENT/)
+  document.render().should.not.match(/CHANGED THE CONTENT/)
+
+  document.loadContent({
+    content: (document.content + "\n\n" + "CHANGED THE CONTENT"),
+    reload: true
+  })
+
+  document.content.should.match(/CHANGED THE CONTENT/)
+  document.render().should.match(/CHANGED THE CONTENT/)

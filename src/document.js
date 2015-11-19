@@ -40,9 +40,8 @@ export default class Document {
   }
 
   loadContent(options = {}){
-    if(options.content){ return this.content = options.content }
-    if(options.path){ return this.content = readPath(options.path) }
-
+    if(options.path){ this.content = readPath(options.path) }
+    if(options.content){ this.content = options.content }
     if(options.reload){ this.reload() }
   }
   
