@@ -150,7 +150,9 @@ export default class ModelDefinition {
     let loaded = require(path)
 
     ModelDefinition.cleanupDSL()
-
+    
+    ModelDefinition.last().sourcePath = path
+    
     return loaded
   }
 
@@ -256,6 +258,8 @@ export default class ModelDefinition {
 
     obj.prototype = Model
     
+    obj.sourcePath = definition.sourcePath
+
     obj.getModelDefinition = function(){
       return definition
     }

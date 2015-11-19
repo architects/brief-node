@@ -18,3 +18,8 @@ describe "Exporting and Bundling", ->
     expanded = briefcase.toJSON(format: 'expanded', fresh: true)
     expanded.data.object.name.should.equal('Jon Soeder')
     expanded.assets['folder/system-architecture'].should.match(/svg/)
+
+  it "should include the model definitions the expanded version", ->
+    expanded = briefcase.toJSON(format: 'expanded', fresh: true)
+    expanded.models[0].should.not.equal(undefined)
+    expanded.models[0].should.have.property('sourcePath')

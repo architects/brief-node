@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
+import {models} from './model_registry'
 
 function cached(briefcase, format, options={}){
   let cachedPath = path.join(os.tmpdir(), briefcase.cacheKey + '.' + format + '.json')
@@ -48,6 +49,7 @@ function expanded(briefcase, options){
   
   base.assets = {}
   base.data = {}
+  base.models = briefcase.getModelDefinitions() 
   
   briefcase.assets.each(asset => base.assets[asset.id] = asset.content)
   briefcase.data.each(data_source => base.data[data_source.id] = data_source.data)

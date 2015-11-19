@@ -362,7 +362,7 @@ function processCodeBlocks(document, briefcase){
       if(node.yaml && (node.yaml.visualization || node.view)){
         node.visualization = (node.yaml.visualization || node.view)
         node.type = 'unknown'
-        node.children = [{type:'text',value:'VISUALIZATION'}]
+        node.children = [{type:'text',value:''}]
       }
 
       node.lang = 'yaml'

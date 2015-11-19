@@ -47,6 +47,11 @@ export default class Document {
   
   log(...messages){
     this.renderLog.push(messages)
+
+    this.briefcase.log("info", {
+      document_path: this.path,
+      messages: messages
+    })
   }
 
   viewLog(){
