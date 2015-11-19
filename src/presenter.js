@@ -15,6 +15,21 @@ export default class Presenter {
     this.output = options.output || "console"
 	}
 
+  dump(){
+    let doc = this.document
+
+    return {
+      id: doc.id,
+      path: doc.path,
+      data: doc.data,
+      content: doc.content,
+      options: doc.options,
+      ast: doc.ast,
+      type: doc.getType(),
+      html: doc.render()
+    }
+  }
+
 	children (){
 		this.document.getChildren()
 	}

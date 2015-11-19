@@ -54,12 +54,12 @@ export default class Briefcase {
       name: "briefcase-" + this.name,
       streams:[{
         stream: process.stdout,
-        level: 'debug'
+        level: 'info'
       }]
     }
   
     if(options.log_path){
-      logger.streams.push({ path: options.log_path, level: trace })
+      logger.streams.push({ path: options.log_path, level: 'info' })
     }
 
     this.logger = new Logger(logger)
@@ -72,9 +72,12 @@ export default class Briefcase {
       views_path: path.join(this.root, 'views')
     }
     
+
     this.setup()
   }
   
+  log(...rest){ this.logger.info(...rest) }
+
   /** 
   * Return the outline for this briefcase if it exists.
   */

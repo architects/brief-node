@@ -15,6 +15,10 @@ export default class Document {
     return this.path
   }
   
+  toDebug(){
+    return this.present('dump')
+  }
+ 
   /**
    * creates a new instance of the document at path
    * @param {path} path - the absolute path to the markdown document.
