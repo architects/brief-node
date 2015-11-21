@@ -37,7 +37,7 @@ let pipelines = {
   get rendering(){
     return [
       processLinks,
-      renderVisualizations
+      renderViews
     ]
   }
 }
@@ -50,28 +50,24 @@ function removeNodes(document, briefcase){
   })
 }
 
-/* if code block nodes have been tagged visualizations we need to generate html for their content */
-function renderVisualizations(document, briefcase){
+/* if code block nodes have been tagged as having a view, we need to generate html for their content */
+function renderViews(document, briefcase){
   visit(document.ast, 'unknown', node => {
-    if(node.visualization){
-      let visualization
-      
-      try {
-        if(fs.existsSync(briefcase.config.views_path + '/' + 'index.js')){
-          visualization = require(briefcase.config.views_path + '/' + 'index.js')[node.visualization]
-        }
-
-        if(fs.existsSync(briefcase.config.views_path + '/' + node.visualization + '.js')){
-          visualization = require(briefcase.config.views_path + '/' + node.visualization + '.js')
-        }
-      } catch(e){
-        document.log("Error rendering visualization: " + e.message)
-      }
-      
-      if(typeof(visualization)!=="function"){ return '' }
+    if(node.view){
+      let view
 
       let data = node.yaml || {}
-      let html = visualization(data, document, briefcase)
+
+      briefcase.log("renderViews:yaml_block", {node: node, yaml: data, document:{path: document.path}})
+
+      let html
+
+      try {
+        html = briefcase.views.render(node.view, data, document)
+      } catch(e){
+        console.log("ERROR RENDERING", node)
+      }
+
       let id = node.data.htmlAttributes.id
 
       node.children[0].value = html 
@@ -163,6 +159,12 @@ export function readPath(path) {
   return fs.readFileSync(path).toString()
 }
 
+/* NOTE:
+*
+* We should be tracking the beginning line and ending line numbers for sections.
+*
+* We could also in theory render the line numbers in the html but i'm not sure that buys us anything
+*/
 function nestElements(document) {
   let children = document.ast.children
   let headings = document.ast.children.filter(c => c.type === "heading")
@@ -358,9 +360,10 @@ function processCodeBlocks(document, briefcase){
         }
       }
       
-      // TBD whether we require visualization or view as the key
-      if(node.yaml && (node.yaml.visualization || node.view)){
-        node.visualization = (node.yaml.visualization || node.view)
+      // tag this node as having a view associated with it.
+      // we defer actual rendering until later in the pipeline
+      if(node.yaml && (node.yaml.view || node.view)){
+        node.view = node.view || node.yaml.view 
         node.type = 'unknown'
         node.children = [{type:'text',value:''}]
       }

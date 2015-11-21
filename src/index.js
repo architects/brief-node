@@ -30,8 +30,9 @@ let brief = {
   // TODO
   // Think of a better API for this.
   registry: registry,
+
   model: model,
-  
+ 
   getModelPrototype: function(nameOrTypeAlias, guess = true){
     return getModelPrototype(nameOrTypeAlias, guess)
   },
@@ -50,12 +51,18 @@ let brief = {
   instances: function(){
     return Briefcase.instances()
   },
+  
+  /** 
+  * find a briefcase object that owns a given document or asset path
+  */
   findBriefcaseByPath: function(path){
     return Briefcase.findForPath(path)
   },
+   
   atPath: function(root, options={}){
     return Briefcase.load(root, options)
   },
+
   load: function (root, options={}) {
     return Briefcase.load(root, options)
   },

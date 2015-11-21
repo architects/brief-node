@@ -10,12 +10,19 @@ import Asset from './asset'
 import DataSource from './data_source'
 import Document from './document'
 import Model from './model'
+
 import ModelDefinition from './model_definition'
+
 import Packager from './packager'
 import Resolver from './Resolver'
 
 import collection from './collection'
 import exporters from './exporters'
+
+
+import commands from './helpers/commands'
+import queries from './helpers/queries'
+import views from './helpers/views'
 
 const inflect = inflections(true)
 const pluralize = inflect.pluralize
@@ -23,6 +30,12 @@ const pluralize = inflect.pluralize
 const __cache = {}
 const __documentIndexes = {}
 const __cacheKeys = {}
+
+const __helpers = {
+  commands: {},
+  queries: {},
+  views: {}
+}
 
 export default class Briefcase {
   /**
@@ -36,6 +49,9 @@ export default class Briefcase {
   * @param {path} docs_path - which folder contains the documents.
   * @param {path} models_path - which folder contains the models to use.
   * @param {path} assets_path - which folder contains the assets to use if any.
+  * @param {path} commands_path - which folder contains the commands to use if any.
+  * @param {path} queries_path - which folder contains the queries to use if any.
+  * @param {path} views_path - which folder contains the views to use if any.
   */
   constructor(root, options) {
     __cache[this.root] = this
@@ -48,7 +64,10 @@ export default class Briefcase {
 
     this.model_definitions = {}
     this.collections = {}
-
+      
+    commands.decorate(this, __helpers.commands)
+    queries.decorate(this, __helpers.queries)
+    views.decorate(this, __helpers.views)
 
     let logger = {
       name: "briefcase-" + this.name,
@@ -69,9 +88,10 @@ export default class Briefcase {
       models_path: path.join(this.root, 'models'),
       assets_path: path.join(this.root, 'assets'),
       data_path: path.join(this.root, 'data'),
-      views_path: path.join(this.root, 'views')
+      views_path: path.join(this.root, 'views'),
+      commands_path: path.join(this.root, 'commands'),
+      queries_path: path.join(this.root, 'queries'),
     }
-    
 
     this.setup()
   }
@@ -218,10 +238,14 @@ export default class Briefcase {
     })
     
     loadModelDefinitions(this)
+
     createAssetRepository(this) 
+
     createDataRepository(this) 
+
+    loadHelpers(this)
   }
-  
+
   /**
   * use a plugin to load modules, actions, CLI helpers, etc
   */
@@ -252,6 +276,7 @@ export default class Briefcase {
   findDocumentByPath(path){
     return this.atPath(path_alias, true)
   }
+
   /**
   * get models at each of the paths represented
   * by the glob pattern passed here.
@@ -338,7 +363,7 @@ export default class Briefcase {
   getDocumentTypes () {
     return Object.keys(this.model_definitions).map(name => inflect.underscore(name.toLowerCase()))
   }
-  
+    
   loadModelDefinition(path){
     return this.loadModel(ModelDefinition.load(path))
   }
@@ -452,4 +477,14 @@ function createDataRepository(briefcase){
       return briefcase.collections.data = DataSource.repo(briefcase, briefcase.config.data || {})
     }
   }) 
+}
+
+function loadHelpers(briefcase){
+  let commands = glob.sync(path.join(briefcase.config.commands_path,'**/*.js'))
+  let queries = glob.sync(path.join(briefcase.config.queries_path,'**/*.js'))
+  let views = glob.sync(path.join(briefcase.config.views_path,'**/*.js'))
+
+  commands.forEach(command => briefcase.commands.fromPath(command))
+  queries.forEach(query => briefcase.queries.fromPath(query))
+  views.forEach(view => briefcase.views.fromPath(view))
 }

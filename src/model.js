@@ -124,6 +124,11 @@ export default class Model {
       id: this.id,
       data: this.data,
       lastModifiedAt: this.lastModifiedAt(),
+      relationIds: this.relationIds,
+      document:{
+        path: this.document.path,
+        id: this.document.id
+      }
     }
   }
   

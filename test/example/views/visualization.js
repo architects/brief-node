@@ -1,5 +1,8 @@
-var string = require('underscore.string')
-
-module.exports = function(data, document, briefcase){
-  return string.unescapeHTML('<h1>Look I rendered your visualiation</h1>')
+function view(params, document, briefcase){
+  return '<h1>look i rendered your node into arbitrary html<span>!!</span></h1>'
 }
+
+module.exports = view
+
+view.label = "visualization"
+view.natural = "an example visualization"
