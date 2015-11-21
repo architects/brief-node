@@ -1,23 +1,65 @@
-# The Active Writing Framework
+# The Reactive Writing Framework
 
 Brief provides you with a set of tools to create "Reactive Documents"
 with markdown and javascript.
 
 Reactive Documents are written in markdown and brought to life through
 the use of flexible, programmable model classes which do things like
-define the structure of the documents and different metadata attributes.
+define the structure of the documents and different metadata attributes
+so that you can use them to power your own custom logic which controls
+how the document is rendered, and how you can use the content or data to
+power other application concerns.
+
+### A Specific Example 
+
+Let's look at a specific example of a briefcase.  This is a collection
+of recipes that we cook in our kitchen.  This powers an application
+which generates menus for our restaurant.  One of the things which
+influences which recipes are selected is what ingredients are in stock.
+
+We also want the ability to order ingredients automatically when they go
+out of stock. 
+
+How would brief help us build this type of application?
+
+Starting with a file structure like:
+
+```
+- My Cookbook
+  - index.js
+  - models
+    - ingredient.js
+    - recipe.js
+    - supplier.js
+  - data
+    - inventory.json
+  - docs
+    - ingredients
+      - pasta.md
+    - recipes
+      - famous-ravioli.md 
+    - suppliers
+      - pasta-fresh.md
+```
+
+When the briefcase parses all of the files in the docs/ folder
+everything in the ingredients folder will have the functionality and
+relationships that the ingredients model defines. 
+
+A Recipe obviously has many ingredients.  An ingredient might have an association with a supplier. 
+
+This is all pretty standard Object Relational Mapper functionality.
+
+Brief makes it easy to have your objects persisted in simple markdown files.
+
+## Brief's API Classes
 
 ### Briefcases
 
 A Briefcase is the parent project owns all of the different assets,
-documents, data sources, visualizations, and what ever else.  Briefcases
-package up all of these things and wrap them up in a javascript bundle
-that can be `required()` like any other npm package or module.
-
-Briefcases can rely on plugins to define reusable sets of models with 
-relationships between them.  Maybe it is a cookbook, a software project
-management wiki, an interactive style guide for a website. Brief
-provides the ultimate level of flexibility and customization to writers.
+documents, data sources, visualizations, and what ever else is contained
+within the root folder.  Briefcases package up all of these things and wrap them up 
+in a javascript bundle that can be `required()` like any other npm package or module.
 
 ### Documents
 
@@ -39,9 +81,9 @@ document, and the data it contains.
 
 A Briefcase project can include `svg, png, jpg, gif, html, css, js`
 files in an assets folder.  These assets will be bundled with the
-project when it gets exported as a single JSON structure.  These
-documents can be embedded directly in the rendered HTML by using special 
-link tag syntax such as:
+project when it gets exported.  
+
+These documents can be embedded directly in the rendered HTML by using special link tag syntax such as:
 
 ```markdown
 [embed:asset](folder/asset-name)
@@ -58,7 +100,7 @@ project when it gets exported as a single JSON structure.
 Data sources are useful ways of powering visualizations that get
 embedded in your document.
 
-### Visualizations
+### Views
 
 A Briefcase can include javascript files in `briefcase.config.views_path`.
 
@@ -67,7 +109,7 @@ These javascript files are expected to export a function and return some HTML.
 In your documents, you include a YAML block like:
 
 ```yaml
-visualization: my_custom_visualization
+view: my_custom_visualization
 data: whatever
 ```
 
